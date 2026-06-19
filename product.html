@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrewInsight — Product & Pricing</title>
+
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/colors.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/typography.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/effects.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/styles.css">
+<link rel="stylesheet" href="site.css">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/_ds_bundle.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel">
+const { Eyebrow, SourceBadge, StatCard, Badge } = window.BrewInsightDesignSystem_a940df;
+
+function Hero() {
+  return (
+    <section className="section" style={{ paddingTop: "var(--space-9)", paddingBottom: "var(--space-7)" }}>
+      <div className="container">
+        <div className="stack gap-5" style={{ maxWidth: "60ch" }}>
+          <span className="eyebrow">The product</span>
+          <h1 className="display">Everything your café's data <span className="accent">is trying to tell you.</span></h1>
+          <p className="lead" style={{ maxWidth: "54ch" }}>
+            One simple service that watches your reviews, tracks what's trending in coffee, and sends you a short, sourced read every week. No setup marathon, no spreadsheets.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const FEATURES = [
+  {
+    icon: "star",
+    title: "Review tracking & validation",
+    body: "We pull every review from Google and Yelp and check the count against the real listing. If Google says 1,100 reviews, BrewInsight says 1,100, never a silent gap.",
+    points: ["Live rating and review volume", "New-review alerts", "Counts validated against the source"],
+  },
+  {
+    icon: "line-chart",
+    title: "Weekly trend reports",
+    body: "A short report every week on what's rising and cooling in coffee, local to your city, so your menu moves before the trend does.",
+    points: ["Search-trend tracking by city", "Seasonal and emerging drinks", "Plain-language takeaways"],
+  },
+  {
+    icon: "scale",
+    title: "Benchmarks vs cafés like yours",
+    body: "See how your rating, review momentum, and pricing sit against cafés your size in your area. Context, not just numbers.",
+    points: ["Compare to similar cafés", "Rating and momentum percentiles", "Spot where you're ahead or behind"],
+  },
+  {
+    icon: "badge-check",
+    title: "Sourced every single time",
+    body: "Every figure carries its source: Google Trends, NCA, Statista, Toast. The kind of credibility you can screenshot and stand behind.",
+    points: ["A citation on every number", "Interpretations marked as such", "Nothing fabricated, ever"],
+  },
+];
+
+function Features() {
+  return (
+    <section className="section--tight">
+      <div className="container">
+        <div className="grid grid-2">
+          {FEATURES.map(f => (
+            <div className="card" key={f.title}>
+              <span className="feature-ico"><Ico name={f.icon} className="" /></span>
+              <h3 className="h3">{f.title}</h3>
+              <p className="body mt-3">{f.body}</p>
+              <ul className="check mt-5">
+                {f.points.map(p => (
+                  <li key={p}><span className="ck"><Ico name="check" /></span><span>{p}</span></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const STEPS = [
+  { n: "01", title: "Connect your listings", body: "Point us at your Google and Yelp pages. That's the whole setup, about two minutes." },
+  { n: "02", title: "We pull and validate", body: "BrewInsight gathers your reviews and the latest coffee-industry data, then checks every figure against the source." },
+  { n: "03", title: "Get your weekly read", body: "A clear, sourced report lands each week with one thing worth doing about it." },
+];
+
+function HowItWorks() {
+  return (
+    <section className="dark section bi-graph-paper">
+      <div className="container">
+        <div className="stack gap-3" style={{ maxWidth: "48ch" }}>
+          <span className="eyebrow">How it works</span>
+          <h2 className="h1" style={{ color: "var(--paper)" }}>Up and running in <span className="accent-lime">about two minutes.</span></h2>
+        </div>
+        <div className="grid grid-3 mt-7">
+          {STEPS.map(s => (
+            <div key={s.n} className="stack gap-3">
+              <span className="aside" style={{ color: "var(--lime)", fontSize: "2.6em" }}>{s.n}</span>
+              <h3 className="h3" style={{ color: "var(--paper)" }}>{s.title}</h3>
+              <p className="body">{s.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Pricing() {
+  const includes = [
+    "Weekly review + trend report",
+    "Google & Yelp review tracking, validated",
+    "Local search-trend reports",
+    "Benchmarks vs cafés like yours",
+    "A source on every number",
+    "Email support, reply within a day",
+  ];
+  return (
+    <section className="section" id="pricing">
+      <div className="container">
+        <div className="stack gap-3" style={{ maxWidth: "46ch", textAlign: "center", margin: "0 auto" }}>
+          <span className="eyebrow" style={{ alignSelf: "center" }}>Pricing</span>
+          <h2 className="h1">One plan. <span className="accent-amber">One fair price.</span></h2>
+          <p className="lead" style={{ textAlign: "center", margin: "0 auto" }}>
+            Start free for 14 days. Keep going for less than a few bags of beans a month.
+          </p>
+        </div>
+
+        <div style={{ maxWidth: "560px", margin: "var(--space-7) auto 0" }}>
+          <Framed className="card" style={{ padding: "clamp(28px, 4vw, 48px)" }}>
+            <div className="row wrap" style={{ justifyContent: "space-between", alignItems: "center", gap: "var(--space-3)" }}>
+              <Eyebrow>BrewInsight</Eyebrow>
+              <Badge tone="amber" solid>Founding rate</Badge>
+            </div>
+            <div className="row mt-5" style={{ alignItems: "flex-end", gap: "10px" }}>
+              <span style={{ fontWeight: "var(--fw-black)", fontSize: "clamp(56px, 9vw, 88px)", lineHeight: 0.9, color: "var(--amber)", letterSpacing: "-0.02em" }}>$29</span>
+              <span className="muted" style={{ fontSize: "var(--ui-lg)", paddingBottom: "10px" }}>/ month per café</span>
+            </div>
+            <p className="body mt-3" style={{ fontSize: "var(--ui-sm)" }}>
+              Or $290 a year, two months free. Founding cafés lock this rate for life.
+            </p>
+            <a className="btn btn--amber btn--lg mt-5" style={{ width: "100%" }} href="contact.html">Start your 14-day free trial<Ico name="arrow-right" /></a>
+            <p className="body mt-3" style={{ textAlign: "center", fontSize: "var(--ui-sm)" }}>No card required to start.</p>
+            <div style={{ height: 1, background: "var(--track-grey)", margin: "var(--space-6) 0" }}></div>
+            <ul className="check" style={{ fontSize: "var(--ui-base)" }}>
+              {includes.map(i => (
+                <li key={i}><span className="ck"><Ico name="check" /></span><span>{i}</span></li>
+              ))}
+            </ul>
+          </Framed>
+          <p className="body" style={{ textAlign: "center", marginTop: "var(--space-5)", fontSize: "var(--ui-sm)" }}>
+            Running more than one café? <a href="contact.html" style={{ color: "var(--forest)", fontWeight: 600 }}>Talk to us about multi-location.</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const FAQ = [
+  { q: "Do I need to install anything?", a: "No. Share your Google and Yelp links and BrewInsight does the rest. Reports arrive by email." },
+  { q: "Where does the data come from?", a: "Your live Google and Yelp listings, Google Trends, and industry sources like the NCA, Statista, and Toast. Every figure is cited." },
+  { q: "What happens after the free trial?", a: "Nothing automatic. We'll check in before it ends. Keep going only if it's earning its place." },
+];
+
+function Faq() {
+  return (
+    <section className="section--tight">
+      <div className="container">
+        <div className="stack gap-3" style={{ maxWidth: "40ch" }}>
+          <span className="eyebrow">Good to know</span>
+          <h2 className="h2">A few quick answers.</h2>
+        </div>
+        <div className="grid grid-3 mt-6">
+          {FAQ.map(f => (
+            <div key={f.q} className="stack gap-3">
+              <h3 className="h3" style={{ fontSize: "var(--ui-lg)" }}>{f.q}</h3>
+              <p className="body">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  useLucide();
+  return (
+    <React.Fragment>
+      <SiteHeader active="product" />
+      <main>
+        <Hero />
+        <Features />
+        <HowItWorks />
+        <Pricing />
+        <Faq />
+      </main>
+      <SiteFooter />
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

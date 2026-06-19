@@ -1,0 +1,62 @@
+/* BrewInsight — Color tokens
+ * Cream and charcoal are the spine; everything else is an accent.
+ * Values sampled directly from published artwork. Digital use is RGB/HEX.
+ * RULE: one accent leads per post. Green leads trend/community/growth;
+ * amber leads money/cost/premium. Lime is dark-surface only. No black backgrounds.
+ */
+:root {
+  /* ---- Spine ---- */
+  --paper:        #F7F4EF; /* primary background — every layout */
+  --ink:          #1A1A1A; /* headlines, structure (not pure black) */
+  --white:        #FFFFFF; /* stat cards, hairlines on cream */
+
+  /* ---- Accents ---- */
+  --forest:       #386830; /* PRIMARY accent — trend / community / growth */
+  --sage:         #6B8360; /* secondary data fills, supporting bars */
+  --amber:        #C88038; /* SECOND accent — money / cost / premium (hint only) */
+  --lime:         #88C048; /* brightness pop — DARK SURFACES ONLY, sparing */
+  --deep-green:   #1B2E1A; /* feature / manifesto / dark surface */
+  --body-grey:    #595C55; /* secondary text, captions */
+
+  /* ---- Structural tints (non-accent — never carry brand meaning) ----
+   * Blessed working neutrals that appear in production. A palette audit
+   * treats these as structural, not accents. Do not add NEW ones. */
+  --soft-sage:    #C9D2BE; /* unfilled pictograph units, tracks */
+  --sketch-detail:#9DB191; /* light sketch / hatch detail on cream */
+  --track-grey:   #E6E3DA; /* gridlines, hairline tracks, dividers on cream */
+  --dark-2:       #33472D; /* dark-surface support tone */
+  --dark-3:       #5A7A4A; /* dark-surface mid tone */
+  --dark-text:    #9FB094; /* muted text on dark surfaces */
+
+  /* ===== Semantic aliases ===== */
+
+  /* Surfaces */
+  --bg-page:        var(--paper);
+  --bg-feature:     var(--deep-green); /* the only "dark" background — never black */
+  --surface-card:   var(--white);
+  --surface-sunken: #EFEBE3;           /* faint inset on cream */
+
+  /* Text */
+  --text-heading:   var(--ink);
+  --text-body:      var(--ink);
+  --text-muted:     var(--body-grey);
+  --text-on-dark:   var(--paper);
+  --text-on-dark-muted: var(--dark-text);
+
+  /* Accents by meaning */
+  --accent-trend:   var(--forest); /* growth, community, the workhorse */
+  --accent-money:   var(--amber);  /* cost, premium, "golden" — a single hint */
+  --accent-pop:     var(--lime);   /* emphasis on dark surfaces only */
+
+  /* Data-viz roles */
+  --data-primary:   var(--forest); /* lead series */
+  --data-secondary: var(--sage);   /* supporting series */
+  --data-empty:     var(--soft-sage); /* empty pictograph units, unfilled track */
+  --data-key:       var(--amber);  /* the single key money figure */
+  --data-pop:       var(--lime);   /* dark-surface lead series */
+
+  /* Lines & borders */
+  --hairline:       var(--track-grey);   /* dividers, gridlines on cream */
+  --border-strong:  var(--ink);
+  --frame-line:     var(--ink);           /* corner-bracket crop marks */
+}

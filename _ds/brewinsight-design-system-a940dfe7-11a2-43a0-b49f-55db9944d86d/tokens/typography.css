@@ -1,0 +1,52 @@
+/* BrewInsight — Typography tokens
+ * Two-voice system: Inter (structure) + Caveat (annotation voice, asides only).
+ * Headlines ExtraBold/Black, title case, tight leading, ONE accent phrase.
+ * Eyebrows + footer wordmark are the only uppercase elements.
+ * Caveat is an accent only — never headlines or body.
+ *
+ * The type scale is tuned for the 1080×1350 post canvas (large display sizes).
+ * For smaller UI surfaces, step down to the --ui-* sizes.
+ */
+:root {
+  /* ---- Families ---- */
+  --font-structure: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-annotation: 'Caveat', 'Comic Sans MS', cursive; /* asides/annotations ONLY */
+
+  /* ---- Weights ---- */
+  --fw-regular:   400;  /* @kind other */
+  --fw-medium:    500;  /* @kind other */
+  --fw-semibold:  600;  /* @kind other */ /* eyebrows, footer wordmark, Caveat body */
+  --fw-bold:      700;  /* @kind other */
+  --fw-extrabold: 800;  /* @kind other */ /* headlines, data figures */
+  --fw-black:     900;  /* @kind other */ /* hero headlines, hero figures */
+
+  /* ---- Display scale (post canvas, ~1080px wide) ---- */
+  --text-hero:      120px; /* the single hero number */
+  --text-headline:  64px;  /* accent headline */
+  --text-headline-sm: 48px;
+  --text-subhead:   28px;
+  --text-eyebrow:   18px;
+  --text-figure:    44px;  /* data figures in stat rows */
+  --text-caption:   20px;
+  --text-footer:    18px;
+  --text-annotation: 34px; /* Caveat asides */
+
+  /* ---- UI scale (components, specimen surfaces) ---- */
+  --ui-display:   34px;
+  --ui-h1:        28px;
+  --ui-h2:        22px;
+  --ui-lg:        18px;
+  --ui-base:      16px;
+  --ui-sm:        14px;
+  --ui-xs:        12px;
+
+  /* ---- Leading ---- */
+  --leading-tight:  0.99;  /* headlines  @kind other */
+  --leading-snug:   1.15;  /* @kind other */
+  --leading-body:   1.45;  /* subhead / body  @kind other */
+
+  /* ---- Tracking ---- */
+  --track-eyebrow:  0.22em; /* letter-spaced grey caps  @kind other */
+  --track-wordmark: 0.34em; /* footer BREWINSIGHT  @kind other */
+  --track-tight:    -0.01em; /* @kind other */
+}

@@ -1,0 +1,6 @@
+/* BrewInsight — Webfonts
+ * Two-voice system, locked: Inter (structure) + Caveat (hand-lettered annotations).
+ * Loaded from Google Fonts, matching the brand's production pipeline.
+ * Inter weights: 400 / 600 / 800 / 900.  Caveat weights: 600 / 700.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');

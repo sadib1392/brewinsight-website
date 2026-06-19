@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrewInsight — Insights for café owners</title>
+
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/colors.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/typography.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/effects.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/styles.css">
+<link rel="stylesheet" href="site.css">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/_ds_bundle.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel">
+const { Logo, Eyebrow, SourceBadge, StatCard, Button, Badge, TrendChart } = window.BrewInsightDesignSystem_a940df;
+
+function Hero() {
+  return (
+    <section className="section" style={{ paddingTop: "var(--space-9)" }}>
+      <div className="container">
+        <Framed style={{ padding: "clamp(28px, 4vw, 56px)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: "var(--space-8)", alignItems: "center" }} className="hero-grid">
+            <div className="stack gap-5">
+              <span className="eyebrow">Insights for café owners</span>
+              <h1 className="display">
+                The data your café leaves behind, <span className="accent">finally worth reading.</span>
+              </h1>
+              <p className="lead">
+                BrewInsight pulls your Google and Yelp reviews, local search trends, and coffee-industry data into one short weekly read. Clear numbers, a real source on every one, and something you can act on this week.
+              </p>
+              <div className="row wrap gap-4 mt-2">
+                <a className="btn btn--forest btn--lg" href="contact.html">Start your free trial<Ico name="arrow-right" /></a>
+                <a className="btn btn--outline btn--lg" href="product.html">See the product</a>
+              </div>
+              <div className="row wrap gap-3 mt-3">
+                <span className="pill pill--soft"><Ico name="check" /> 14-day free trial</span>
+                <span className="pill pill--soft"><Ico name="check" /> Built for independent cafés</span>
+              </div>
+            </div>
+
+            <div className="card hero-card" style={{ position: "relative" }}>
+              <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+                <Eyebrow handle="@brewinsight">Weekly read</Eyebrow>
+                <Badge tone="forest" solid>Rising</Badge>
+              </div>
+              <h3 className="h3 mt-4" style={{ letterSpacing: "-0.01em" }}>
+                Matcha is still climbing in your city.
+              </h3>
+              <div className="mt-4">
+                <TrendChart
+                  values={[8, 14, 12, 22, 30, 28, 46, 58, 74, 96]}
+                  labels={["2021", "", "", "2024", "", "Today"]}
+                  width={460}
+                  height={210}
+                  annotation={{ text: "All-time high", index: 9, align: "right" }}
+                  style={{ width: "100%" }}
+                />
+              </div>
+              <p className="body mt-3" style={{ fontSize: "var(--ui-sm)" }}>
+                Search interest for "matcha", indexed 0–100. <strong style={{ color: "var(--ink)" }}>Worth a seasonal special.</strong>
+              </p>
+              <div className="mt-4">
+                <SourceBadge state="light">GOOGLE TRENDS</SourceBadge>
+              </div>
+            </div>
+          </div>
+        </Framed>
+      </div>
+    </section>
+  );
+}
+
+const FEATURES = [
+  { icon: "message-square-quote", title: "Review intelligence", body: "Every Google and Yelp review, pulled in and checked against the source. Your rating, your volume, your momentum, all of it real and current." },
+  { icon: "trending-up", title: "Weekly café trends", body: "What's rising in coffee right now, local to your city. Matcha, cold foam, oat milk, told as plain numbers you can plan a menu around." },
+  { icon: "users", title: "Cafés like yours", body: "See what's working for cafés your size, in your area. Benchmark yourself instead of guessing in the dark." },
+];
+
+function WhatWeDo() {
+  return (
+    <section className="section" id="what">
+      <div className="container">
+        <div className="stack gap-3" style={{ maxWidth: "52ch" }}>
+          <span className="eyebrow">What you get</span>
+          <h2 className="h1">Three things, every week. <span className="accent">No dashboard to babysit.</span></h2>
+        </div>
+        <div className="grid grid-3 mt-7">
+          {FEATURES.map(f => (
+            <div className="card" key={f.title}>
+              <span className="feature-ico"><Ico name={f.icon} className="" /></span>
+              <h3 className="h3">{f.title}</h3>
+              <p className="body mt-3">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Proof() {
+  return (
+    <section className="section--tight">
+      <div className="container">
+        <div className="row wrap" style={{ justifyContent: "space-between", alignItems: "flex-end", gap: "var(--space-5)" }}>
+          <div className="stack gap-3" style={{ maxWidth: "46ch" }}>
+            <span className="eyebrow">The kind of insight you get</span>
+            <h2 className="h2">Numbers you can actually use, never a stat without a source.</h2>
+          </div>
+          <span className="pill pill--source"><span className="lbl">SOURCE:</span> GOOGLE TRENDS · NCA · STATISTA</span>
+        </div>
+        <div className="grid grid-3 mt-6">
+          <StatCard sub="Trend" figure="+350%" caption="rise in matcha searches since 2021" accent="var(--forest)" />
+          <StatCard sub="Demographics" figure="40%" caption="of US coffee drinkers are Millennials" accent="var(--ink)" />
+          <StatCard sub="Peak" figure="96/100" caption="matcha search index in LA, an all-time high" accent="var(--forest)" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Manifesto() {
+  return (
+    <section className="dark section bi-graph-paper">
+      <div className="container">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "center" }} className="grid-2">
+          <div className="stack gap-5">
+            <span className="eyebrow">Why we built this</span>
+            <h2 className="h1" style={{ color: "var(--paper)" }}>
+              Made for the people <span className="accent-lime">behind the counter.</span>
+            </h2>
+            <p className="lead">
+              The big chains have analysts. You have a morning rush and a wholesale order to chase. BrewInsight does the reading so you don't have to, and we never dress up a guess as a fact.
+            </p>
+          </div>
+          <ul className="check" style={{ fontSize: "var(--ui-lg)", color: "var(--paper)" }}>
+            <li><span className="ck"><Ico name="badge-check" /></span><span><strong>Credibility first.</strong> Every number carries its source. If we can't back it, we don't post it.</span></li>
+            <li><span className="ck"><Ico name="shield-check" /></span><span><strong>Honest data.</strong> We validate review counts against the real listing. No silent gaps, no inflated figures.</span></li>
+            <li><span className="ck"><Ico name="coffee" /></span><span><strong>Independent only.</strong> Built for small cafés and the people opening their first one, not enterprise chains.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CTABand() {
+  return (
+    <section className="section">
+      <div className="container">
+        <Framed className="card" style={{ background: "var(--surface-card)", padding: "clamp(32px, 5vw, 64px)", textAlign: "center" }}>
+          <div className="stack" style={{ alignItems: "center", gap: "var(--space-5)" }}>
+            <span className="aside">your first read is on us</span>
+            <h2 className="h1" style={{ maxWidth: "20ch" }}>Start reading your café's data this week.</h2>
+            <p className="lead" style={{ textAlign: "center", maxWidth: "48ch" }}>
+              Free for 14 days. No card to get started. Founding cafés keep their rate for life.
+            </p>
+            <a className="btn btn--forest btn--lg mt-2" href="contact.html">Start your free trial<Ico name="arrow-right" /></a>
+          </div>
+        </Framed>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  useLucide();
+  return (
+    <React.Fragment>
+      <SiteHeader active="about" />
+      <main>
+        <Hero />
+        <WhatWeDo />
+        <Proof />
+        <Manifesto />
+        <CTABand />
+      </main>
+      <SiteFooter />
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+<style>
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr !important; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+}
+</style>
+</body>
+</html>

@@ -1,0 +1,37 @@
+/* BrewInsight — Spacing & layout tokens
+ * Built on an 8px rhythm. Generous white space is part of the identity —
+ * accents punctuate, they do not fill. Protect the breathing room.
+ */
+:root {
+  /* ---- Spacing scale (8px base) ---- */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   24px;
+  --space-6:   32px;
+  --space-7:   48px;
+  --space-8:   64px;
+  --space-9:   88px;
+  --space-10:  120px;
+
+  /* ---- Post canvas ---- */
+  --post-w:    1080px;  /* 4:5 portrait feed post */
+  --post-h:    1350px;
+  --logo-size: 1080px;  /* logo lockup is 1:1 square */
+
+  /* ---- Canvas padding (the margin inside the corner-bracket frame) ---- */
+  --post-pad:  80px;
+
+  /* ---- Corner-bracket frame ---- */
+  --frame-inset:  44px;  /* how far the L-marks sit in from each edge */
+  --frame-len:    56px;  /* length of each crop-mark leg */
+  --frame-weight: 2px;   /* stroke weight of the crop marks */
+
+  /* ---- UI surfaces (components/specimens) ---- */
+  --gap-xs: 6px;
+  --gap-sm: 10px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+}

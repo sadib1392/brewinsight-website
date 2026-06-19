@@ -321,3 +321,211 @@ ul.check li .ck { color: var(--forest); flex: 0 0 auto; margin-top: 1px; }
 @media (max-width: 480px) {
   .nav__links { gap: var(--space-3); }
 }
+
+/* =====================================================================
+ * HOMEPAGE REDESIGN — patterns adapted onto the BrewInsight brand
+ *   Hero          → Shopify  (outcome-led, one dominant action per band)
+ *   What you get  → Airtable (structured insight modules w/ data fragments)
+ *   Sample board  → Airtable (working-tool: tiles, table, chips, actions)
+ * Everything below is built only from design-system tokens.
+ * ===================================================================== */
+
+/* ---- Hero: Shopify conversion rhythm ---- */
+.hero-cta { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
+.hero-cta .text-cta {
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  border-bottom: 2px solid var(--track-grey);
+  padding-bottom: 2px;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+.hero-cta .text-cta:hover { border-color: var(--forest); }
+.hero-proof {
+  display: flex; align-items: center; gap: var(--space-3);
+  color: var(--body-grey); font-size: var(--ui-sm);
+}
+.hero-proof .dot { width: 4px; height: 4px; border-radius: 999px; background: var(--sketch-detail); }
+
+/* ---- Airtable insight modules ---- */
+.modules { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
+.module {
+  background: var(--surface-card);
+  border: 1px solid var(--track-grey);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+.module__head { display: flex; align-items: center; gap: var(--space-3); }
+.module__ico {
+  width: 38px; height: 38px; flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--forest) 10%, var(--paper));
+  color: var(--forest);
+}
+.module__ico svg { width: 20px; height: 20px; }
+.module__title { font-weight: var(--fw-bold); font-size: var(--ui-lg); color: var(--ink); }
+.module__body { color: var(--text-muted); font-size: var(--ui-sm); margin: 0; }
+/* the data "fragment" each module carries — Airtable's product-UI-in-a-card move */
+.frag {
+  margin-top: auto;
+  background: var(--surface-sunken);
+  border: 1px solid var(--track-grey);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+.frag__label {
+  font-size: var(--ui-xs); font-weight: var(--fw-semibold);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--body-grey);
+}
+.frag-rating { display: flex; align-items: baseline; gap: var(--space-3); }
+.frag-rating .num { font-weight: var(--fw-black); font-size: 30px; color: var(--ink); line-height: 1; letter-spacing: -0.01em; }
+.frag-rating .stars { color: var(--amber); letter-spacing: 1px; font-size: var(--ui-sm); }
+.frag-rating .meta { color: var(--body-grey); font-size: var(--ui-xs); }
+/* trend chips (rising / cooling) */
+.trend-chip {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  padding: 5px 10px; border-radius: var(--radius-pill);
+  font-size: var(--ui-xs); font-weight: var(--fw-semibold);
+  background: color-mix(in srgb, var(--forest) 10%, var(--paper));
+  color: var(--forest);
+}
+.trend-chip svg { width: 13px; height: 13px; }
+.trend-chip.is-cool { background: color-mix(in srgb, var(--body-grey) 12%, var(--paper)); color: var(--body-grey); }
+.trend-chip.is-amber { background: color-mix(in srgb, var(--amber) 14%, var(--paper)); color: var(--amber); }
+.chip-wrap { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+/* benchmark bar */
+.bench { display: flex; flex-direction: column; gap: 8px; }
+.bench__track { position: relative; height: 8px; border-radius: 999px; background: var(--soft-sage); }
+.bench__fill { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--forest); }
+.bench__mark { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--ink); border-radius: 1px; }
+.bench__row { display: flex; justify-content: space-between; font-size: var(--ui-xs); color: var(--body-grey); }
+/* signature (dark) module — Airtable's voltage card, BrewInsight deep-green */
+.module--signature {
+  background: var(--deep-green);
+  border-color: var(--dark-2);
+}
+.module--signature .module__title { color: var(--paper); }
+.module--signature .module__body { color: var(--text-on-dark-muted); }
+.module--signature .module__ico { background: rgba(136,192,72,0.14); color: var(--lime); }
+.module--signature .frag { background: rgba(255,255,255,0.04); border-color: var(--dark-2); }
+.module--signature .frag__label { color: var(--dark-text); }
+.act-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.act-list li { display: flex; align-items: flex-start; gap: 10px; font-size: var(--ui-sm); color: var(--paper); line-height: 1.35; }
+.act-list .ck { color: var(--lime); flex: 0 0 auto; margin-top: 1px; }
+.act-list .ck svg { width: 16px; height: 16px; }
+
+/* ---- Airtable sample dashboard (the working-tool showcase) ---- */
+.dash-wrap { margin-top: var(--space-7); }
+.dash {
+  background: var(--surface-card);
+  border: 1px solid var(--track-grey);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-lg);
+  overflow: hidden;
+}
+.dash__chrome {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--track-grey);
+  background: var(--surface-sunken);
+}
+.dash__dots { display: flex; gap: 6px; }
+.dash__dots i { width: 10px; height: 10px; border-radius: 999px; background: var(--track-grey); display: inline-block; }
+.dash__title { font-weight: var(--fw-semibold); color: var(--ink); font-size: var(--ui-sm); }
+.dash__title .muted { color: var(--body-grey); font-weight: var(--fw-medium); }
+.dash__chrome .spacer { flex: 1; }
+.dash__body { padding: var(--space-5); display: grid; gap: var(--space-5); }
+/* toolbar: filter chips */
+.dash__toolbar { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  padding: 6px 12px; border-radius: var(--radius-pill);
+  font-size: var(--ui-xs); font-weight: var(--fw-semibold);
+  border: 1px solid var(--track-grey); background: var(--paper); color: var(--body-grey);
+}
+.chip svg { width: 13px; height: 13px; }
+.chip.is-active { border-color: var(--forest); color: var(--forest); background: color-mix(in srgb, var(--forest) 8%, var(--paper)); }
+.chip .x { color: var(--sketch-detail); }
+.dash__toolbar .spacer { flex: 1; }
+/* stat tiles */
+.dash__tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+.tile {
+  border: 1px solid var(--track-grey); border-radius: var(--radius-md);
+  padding: var(--space-4); background: var(--paper);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.tile__label { font-size: var(--ui-xs); color: var(--body-grey); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: 0.08em; }
+.tile__fig { display: flex; align-items: baseline; gap: 8px; }
+.tile__fig .v { font-weight: var(--fw-black); font-size: 26px; color: var(--ink); line-height: 1; letter-spacing: -0.01em; }
+.tile__delta { font-size: var(--ui-xs); font-weight: var(--fw-semibold); display: inline-flex; align-items: center; gap: 3px; }
+.tile__delta.up { color: var(--forest); }
+.tile__delta.down { color: var(--amber); }
+.tile__delta svg { width: 12px; height: 12px; }
+/* dashboard split: table + side panel */
+.dash__split { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-5); align-items: start; }
+.dash__pane-label {
+  font-size: var(--ui-xs); font-weight: var(--fw-bold);
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--body-grey);
+  margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: space-between;
+}
+/* reviews table */
+.dtable-wrap { border: 1px solid var(--track-grey); border-radius: var(--radius-md); overflow: hidden; }
+.dtable { width: 100%; border-collapse: collapse; font-size: var(--ui-sm); }
+.dtable thead th {
+  text-align: left; font-size: var(--ui-xs); font-weight: var(--fw-semibold);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--body-grey);
+  padding: 10px 12px; background: var(--surface-sunken); border-bottom: 1px solid var(--track-grey);
+}
+.dtable tbody td { padding: 11px 12px; border-bottom: 1px solid var(--track-grey); color: var(--ink); vertical-align: middle; }
+.dtable tbody tr:last-child td { border-bottom: none; }
+.dtable .src { font-size: var(--ui-xs); font-weight: var(--fw-bold); letter-spacing: 0.04em; color: var(--body-grey); }
+.dtable .stars { color: var(--amber); letter-spacing: 1px; white-space: nowrap; }
+.theme-tag {
+  display: inline-flex; align-items: center; padding: 3px 9px; border-radius: var(--radius-pill);
+  font-size: var(--ui-xs); font-weight: var(--fw-semibold);
+  background: var(--surface-sunken); color: var(--body-grey); border: 1px solid var(--track-grey);
+}
+.sent { display: inline-flex; align-items: center; gap: 6px; font-size: var(--ui-xs); font-weight: var(--fw-semibold); }
+.sent .d { width: 8px; height: 8px; border-radius: 999px; flex: 0 0 auto; }
+.sent.pos { color: var(--forest); } .sent.pos .d { background: var(--forest); }
+.sent.neu { color: var(--sage); }   .sent.neu .d { background: var(--sage); }
+.sent.watch { color: var(--amber); }.sent.watch .d { background: var(--amber); }
+/* side panels */
+.dash-panel { border: 1px solid var(--track-grey); border-radius: var(--radius-md); padding: var(--space-4); background: var(--paper); }
+.dash-panel + .dash-panel { margin-top: var(--space-4); }
+.trend-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 8px 0; }
+.trend-row + .trend-row { border-top: 1px solid var(--track-grey); }
+.trend-row .name { font-size: var(--ui-sm); color: var(--ink); font-weight: var(--fw-medium); }
+.rec { display: flex; gap: 10px; padding: 10px 0; }
+.rec + .rec { border-top: 1px solid var(--track-grey); }
+.rec__mark { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 999px; background: color-mix(in srgb, var(--forest) 12%, var(--paper)); color: var(--forest); display: inline-flex; align-items: center; justify-content: center; }
+.rec__mark svg { width: 13px; height: 13px; }
+.rec__text { font-size: var(--ui-sm); color: var(--ink); line-height: 1.4; }
+.rec__text .src-note { display: block; color: var(--body-grey); font-size: var(--ui-xs); margin-top: 2px; }
+.dash__foot {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  flex-wrap: wrap; padding-top: var(--space-2);
+}
+.illustrative {
+  font-family: var(--font-annotation); font-weight: 700; font-size: 1.15em;
+  color: var(--body-grey); line-height: 1;
+}
+
+/* ---- Responsive for the redesigned homepage ---- */
+@media (max-width: 900px) {
+  .dash__split { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .modules { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .dash__tiles { grid-template-columns: 1fr; }
+  .dtable-wrap { overflow-x: auto; }
+  .dtable { min-width: 460px; }
+  .dash__body { padding: var(--space-4); }
+}

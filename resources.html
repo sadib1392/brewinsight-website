@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrewInsight — Resources</title>
+
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/colors.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/typography.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/effects.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/styles.css">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="docs.css">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/_ds_bundle.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel">
+const { SourceBadge } = window.BrewInsightDesignSystem_a940df;
+
+/* ---------------------------------------------------------------------------
+ * Resources — Mintlify BLOG/article layout adapted onto BrewInsight's brand.
+ * Pattern borrowed: one featured lead article + a clean responsive grid of
+ * article cards, each with a category tag, title, one-line dek, and a
+ * date · read-time meta line. Reading-optimized, generous whitespace.
+ * Brand kept: cream + charcoal, forest accent, amber as a money hint only,
+ * deep-green as the single dark surface (the featured cover). Every article
+ * is marked sample/illustrative.
+ * ------------------------------------------------------------------------- */
+
+/* Sample, illustrative articles. Marked as such on the page. */
+const ARTICLES = [
+  {
+    cat: "Trend explainer", tone: "",
+    title: "Why matcha keeps climbing, and what it means for your menu",
+    dek: "Search interest hit an all-time high in several US cities. A plain-language read on whether a seasonal special is worth it.",
+    date: "Jun 16, 2026", read: "5 min read", strip: "",
+  },
+  {
+    cat: "Café data", tone: "is-amber",
+    title: "What a 0.2 rating bump is actually worth",
+    dek: "Reviews move slowly, but they compound. A back-of-napkin look at how a small rating gain shows up over a season.",
+    date: "Jun 9, 2026", read: "4 min read", strip: "is-amber",
+  },
+  {
+    cat: "Trend explainer", tone: "",
+    title: "Oat milk is no longer the alternative",
+    dek: "Local search for oat milk keeps rising quarter over quarter. How to tell a real shift from a quiet week.",
+    date: "Jun 2, 2026", read: "6 min read", strip: "",
+  },
+  {
+    cat: "Method", tone: "is-neutral",
+    title: "Reading your reviews without drowning in them",
+    dek: "Themes, not stars. A simple way to turn a week of reviews into two things worth acting on.",
+    date: "May 26, 2026", read: "5 min read", strip: "is-sage",
+  },
+  {
+    cat: "Café data", tone: "is-amber",
+    title: "Benchmarking against cafés your size",
+    dek: "A percentile is only useful if the comparison group makes sense. What 'cafés like yours' should and should not include.",
+    date: "May 19, 2026", read: "4 min read", strip: "is-amber",
+  },
+  {
+    cat: "Trend explainer", tone: "",
+    title: "Cold foam, cold brew, and the long summer curve",
+    dek: "Warm-weather drinks follow a predictable shape. Plan the menu around the curve instead of chasing last week.",
+    date: "May 12, 2026", read: "7 min read", strip: "",
+  },
+];
+
+function BlogHead() {
+  return (
+    <section className="doc-head">
+      <div className="container">
+        <div className="doc-head__inner stack gap-4">
+          <span className="eyebrow">Resources</span>
+          <h1 className="h1">Trend reads and café-data breakdowns, <span className="accent">in plain language.</span></h1>
+          <p className="lead">
+            Short explainers on what the coffee data is actually saying, and how an independent café can act on it. No jargon, no stat without a source.
+          </p>
+          <div className="doc-head__meta">
+            <span className="sample-note"><Ico name="coffee" />Sample articles, shown to illustrate the format ☕</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Featured() {
+  return (
+    <section className="section--tight">
+      <div className="container">
+        <Framed className="card" style={{ padding: 0, overflow: "hidden" }}>
+          <article className="featured">
+            <div className="featured__body">
+              <div className="row gap-3 wrap">
+                <span className="cat-tag">Trend explainer</span>
+                <span className="cat-tag is-neutral">Featured</span>
+              </div>
+              <h2 className="featured__title">The matcha wave is still cresting in your city</h2>
+              <p className="featured__dek">
+                Search interest for matcha is at a multi-year high across much of the US. We break down what the trend line is really showing, how local it is, and the one low-risk move most cafés can make this month.
+              </p>
+              <div className="article-meta">
+                <span>Jun 18, 2026</span><span className="dot" /><span>8 min read</span>
+              </div>
+              <a className="featured__cta" href="contact.html">Read the breakdown<Ico name="arrow-right" /></a>
+            </div>
+
+            <div className="featured__cover">
+              <span className="cover-eyebrow">Illustrative · Google Trends</span>
+              <div className="stack gap-3">
+                <span className="cover-figure">96<span className="unit">/100</span></span>
+                <span className="cover-cap">Peak matcha search index in Los Angeles, an all-time high in the sample window.</span>
+              </div>
+              <div><SourceBadge state="dark">GOOGLE TRENDS · SAMPLE</SourceBadge></div>
+            </div>
+          </article>
+        </Framed>
+      </div>
+    </section>
+  );
+}
+
+function Grid() {
+  return (
+    <section className="section--tight">
+      <div className="container">
+        <div className="blog-section-head">
+          <div className="stack gap-3" style={{ maxWidth: "46ch" }}>
+            <span className="eyebrow">Latest reads</span>
+            <h2 className="h2">More from the BrewInsight desk</h2>
+          </div>
+          <span className="pill pill--source"><span className="lbl">SOURCE:</span> GOOGLE TRENDS · NCA · STATISTA</span>
+        </div>
+
+        <div className="article-grid">
+          {ARTICLES.map((a, i) => (
+            <article className="article-card" key={i}>
+              <div className={"article-card__strip " + a.strip} aria-hidden="true" />
+              <div className="article-card__inner">
+                <div><span className={"cat-tag " + a.tone}>{a.cat}</span></div>
+                <h3 className="article-card__title">{a.title}</h3>
+                <p className="article-card__dek">{a.dek}</p>
+                <div className="article-card__foot">
+                  <div className="article-meta">
+                    <span>{a.date}</span><span className="dot" /><span>{a.read}</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <p className="body mt-6" style={{ textAlign: "center" }}>
+          <span className="sample-note"><Ico name="info" />Every article above is sample content, written to show the format and voice. Real reads ship to subscribers each week.</span>
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function CTABand() {
+  return (
+    <section className="section">
+      <div className="container">
+        <Framed className="card" style={{ background: "var(--surface-card)", padding: "clamp(32px, 5vw, 64px)", textAlign: "center" }}>
+          <div className="stack" style={{ alignItems: "center", gap: "var(--space-5)" }}>
+            <span className="aside">the real reads land in your inbox</span>
+            <h2 className="h1" style={{ maxWidth: "22ch" }}>Get one sourced read on your café every week.</h2>
+            <p className="lead" style={{ textAlign: "center", maxWidth: "48ch" }}>
+              Free for 14 days. No card to get started. Every number carries its source.
+            </p>
+            <a className="btn btn--forest btn--lg mt-2" href="contact.html">Start your free trial<Ico name="arrow-right" /></a>
+          </div>
+        </Framed>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  useLucide();
+  return (
+    <React.Fragment>
+      <SiteHeader active="resources" />
+      <main>
+        <BlogHead />
+        <Featured />
+        <Grid />
+        <CTABand />
+      </main>
+      <SiteFooter />
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

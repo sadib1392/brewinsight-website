@@ -20,11 +20,31 @@
 <script src="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/_ds_bundle.js"></script>
 
 <style>
+/* =====================================================================
+ * CONTACT – onboarding intake, Intercom pattern on the BrewInsight brand
+ *   Pattern borrowed: warm cream ground, quiet chrome, floating white
+ *   tiles with hairline borders + modest radii, one confident accent,
+ *   sentence-case eyebrows, conversational microcopy.
+ *   Rendered in BrewInsight's own palette/type (forest accent, Inter).
+ *   ALL colors/type from the design-system tokens – no source-brand values.
+ * ===================================================================== */
+
+/* ---- Form fields ---- */
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field label {
   font-weight: var(--fw-semibold);
   font-size: var(--ui-sm);
   color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.field label .opt {
+  font-weight: var(--fw-medium);
+  font-size: var(--ui-xs);
+  color: var(--body-grey);
+  letter-spacing: 0;
+  text-transform: none;
 }
 .field input, .field textarea {
   font-family: var(--font-structure);
@@ -37,11 +57,83 @@
   outline: none;
   transition: border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
 }
+.field input::placeholder, .field textarea::placeholder { color: var(--sketch-detail); }
 .field input:focus, .field textarea:focus {
   border-color: var(--forest);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--forest) 14%, transparent);
 }
-.field textarea { resize: vertical; min-height: 120px; }
+.field textarea { resize: vertical; min-height: 110px; }
+/* a tiny inline helper line under a field */
+.field .hint {
+  font-size: var(--ui-xs);
+  color: var(--body-grey);
+  line-height: 1.4;
+}
+
+/* ---- Friendly intake "step" groups (floating white tiles) ---- */
+.intake { display: flex; flex-direction: column; gap: var(--space-5); }
+.step {
+  background: var(--surface-card);
+  border: 1px solid var(--track-grey);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: clamp(22px, 3vw, 30px);
+  transition: box-shadow var(--dur-base) var(--ease-standard), border-color var(--dur-base) var(--ease-standard);
+}
+.step:focus-within {
+  border-color: color-mix(in srgb, var(--forest) 30%, var(--track-grey));
+  box-shadow: var(--shadow-card-lg);
+}
+.step__head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+.step__num {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-pill);
+  background: var(--forest);
+  color: var(--paper);
+  font-weight: var(--fw-bold);
+  font-size: var(--ui-sm);
+}
+.step__titles { display: flex; flex-direction: column; gap: 2px; }
+.step__step {
+  font-family: var(--font-structure);
+  font-weight: var(--fw-semibold);
+  font-size: var(--ui-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--body-grey);
+}
+.step__title { font-weight: var(--fw-bold); font-size: var(--ui-h2); color: var(--ink); letter-spacing: -0.01em; line-height: 1.15; }
+.step__note { color: var(--text-muted); font-size: var(--ui-sm); margin: 0 0 var(--space-5); }
+.step__fields { display: flex; flex-direction: column; gap: var(--space-4); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+
+/* ---- Submit area ---- */
+.intake__submit { display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start; }
+.intake__reassure { color: var(--body-grey); font-size: var(--ui-sm); display: flex; align-items: center; gap: 8px; }
+.intake__reassure svg { width: 15px; height: 15px; color: var(--forest); flex: 0 0 auto; }
+
+/* ---- Success "what happens next" ---- */
+.next-list {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: var(--space-3);
+  text-align: left; width: 100%; max-width: 42ch;
+}
+.next-list li { display: flex; align-items: flex-start; gap: 12px; line-height: 1.45; }
+.next-list li .nk {
+  flex: 0 0 auto;
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--forest) 12%, var(--paper));
+  color: var(--forest);
+  font-weight: var(--fw-bold);
+  font-size: var(--ui-xs);
+}
+.next-list li span:last-child { font-size: var(--ui-sm); color: var(--text-body); }
+
+/* ---- Left sidebar contact methods (kept) ---- */
 .contact-method {
   display: flex; align-items: flex-start; gap: 14px;
 }
@@ -54,7 +146,18 @@
   color: var(--forest);
 }
 .contact-method .mi svg { width: 20px; height: 20px; }
-@media (max-width: 860px) { .contact-grid { grid-template-columns: 1fr !important; } }
+
+/* a warm aside tile that sits under the contact methods */
+.side-note {
+  background: var(--surface-sunken);
+  border: 1px solid var(--track-grey);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+.side-note .aside { font-size: 1.25em; }
+
+@media (max-width: 980px) { .contact-grid { grid-template-columns: 1fr !important; gap: var(--space-7) !important; } }
+@media (max-width: 560px) { .field-row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -77,36 +180,92 @@ function ContactForm() {
       <Framed className="card" style={{ padding: "clamp(32px, 5vw, 56px)", textAlign: "center" }}>
         <div className="stack" style={{ alignItems: "center", gap: "var(--space-4)" }}>
           <span className="feature-ico" style={{ marginBottom: 0 }}><Ico name="check" className="" /></span>
+          <span className="aside">your first read is on us</span>
           <h3 className="h2">Thanks, we got it.</h3>
-          <p className="lead" style={{ textAlign: "center" }}>We reply within a day, usually with your café's first read attached. ☕</p>
+          <p className="lead" style={{ textAlign: "center", maxWidth: "46ch" }}>
+            Your trial is on its way. A real person reads every signup, so there's nothing to set up on your end. ☕
+          </p>
+          <ul className="next-list mt-2">
+            <li><span className="nk">1</span><span>We read your Google and Yelp listings and pull your city's coffee trends.</span></li>
+            <li><span className="nk">2</span><span>We send your café's first weekly read back, usually within a day.</span></li>
+            <li><span className="nk">3</span><span>You reply if you want it tuned. No card, no dashboard, no rush.</span></li>
+          </ul>
         </div>
       </Framed>
     );
   }
   return (
-    <Framed className="card" style={{ padding: "clamp(28px, 4vw, 40px)" }}>
-      <form className="stack gap-5" onSubmit={submit}>
-        <div className="grid grid-2" style={{ gap: "var(--space-4)" }}>
-          <div className="field">
-            <label htmlFor="name">Your name</label>
-            <input id="name" name="name" type="text" required placeholder="Jamie Rivera" />
+    <form className="intake" onSubmit={submit}>
+
+        {/* Step 1 – about you and the café */}
+        <div className="step">
+          <div className="step__head">
+            <span className="step__num">1</span>
+            <span className="step__titles">
+              <span className="step__step">Step 1 of 2</span>
+              <span className="step__title">A little about your café</span>
+            </span>
           </div>
-          <div className="field">
-            <label htmlFor="cafe">Café name</label>
-            <input id="cafe" name="cafe" type="text" placeholder="Corner Roasters" />
+          <p className="step__note">Just the basics, so we know who we're reading for. This is you on the trial.</p>
+          <div className="step__fields">
+            <div className="field-row">
+              <div className="field">
+                <label htmlFor="name">Your name</label>
+                <input id="name" name="name" type="text" required placeholder="Jamie Rivera" />
+              </div>
+              <div className="field">
+                <label htmlFor="cafe">Café name</label>
+                <input id="cafe" name="cafe" type="text" required placeholder="Corner Roasters" />
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="city">City or neighborhood</label>
+              <input id="city" name="city" type="text" required placeholder="Silver Lake, Los Angeles" />
+              <span className="hint">We pull local coffee trends for this area.</span>
+            </div>
+            <div className="field">
+              <label htmlFor="email">Email</label>
+              <input id="email" name="email" type="email" required placeholder="jamie@cornerroasters.com" />
+              <span className="hint">Where your weekly read lands. No spam, ever.</span>
+            </div>
           </div>
         </div>
-        <div className="field">
-          <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" required placeholder="jamie@cornerroasters.com" />
+
+        {/* Step 2 – where the café shows up online */}
+        <div className="step">
+          <div className="step__head">
+            <span className="step__num">2</span>
+            <span className="step__titles">
+              <span className="step__step">Step 2 of 2</span>
+              <span className="step__title">Where you show up online</span>
+            </span>
+          </div>
+          <p className="step__note">
+            This is the part we read for you. Drop in your listings and we'll pull the reviews. Not sure of the exact link? Just paste your café name and we'll find it.
+          </p>
+          <div className="step__fields">
+            <div className="field">
+              <label htmlFor="google">Google listing <span className="opt">(link or name)</span></label>
+              <input id="google" name="google" type="text" placeholder="maps.google.com/… or “Corner Roasters, LA”" />
+            </div>
+            <div className="field">
+              <label htmlFor="yelp">Yelp listing <span className="opt">(link or name)</span></label>
+              <input id="yelp" name="yelp" type="text" placeholder="yelp.com/biz/… or “Corner Roasters”" />
+            </div>
+            <div className="field">
+              <label htmlFor="message">What would you like help with? <span className="opt">(optional)</span></label>
+              <textarea id="message" name="message" placeholder="We want to grow weekday mornings and figure out which drinks to feature this season."></textarea>
+            </div>
+          </div>
         </div>
-        <div className="field">
-          <label htmlFor="message">What can we help with?</label>
-          <textarea id="message" name="message" placeholder="I'd love a free trial for my café in Los Angeles."></textarea>
+
+        {/* Submit */}
+        <div className="intake__submit">
+          <button type="submit" className="btn btn--forest btn--lg">Start my free trial<Ico name="arrow-right" /></button>
+          <span className="intake__reassure"><Ico name="shield-check" className="" />14 days free · no card to start · cancel any time</span>
         </div>
-        <button type="submit" className="btn btn--forest btn--lg">Send message<Ico name="arrow-right" /></button>
-      </form>
-    </Framed>
+
+    </form>
   );
 }
 
@@ -115,14 +274,15 @@ function Contact() {
     <section className="section" style={{ paddingTop: "var(--space-9)" }}>
       <div className="container">
         <div className="stack gap-5" style={{ maxWidth: "56ch" }}>
-          <span className="eyebrow">Contact</span>
-          <h1 className="display">Let's talk <span className="accent">café data.</span></h1>
-          <p className="lead" style={{ maxWidth: "50ch" }}>
-            Want a free trial, a quick walkthrough, or just to compare notes on what's selling? Drop us a line. We're café people too.
+          <span className="aside">no card, no dashboard, just hello</span>
+          <span className="eyebrow">Start your trial</span>
+          <h1 className="display">Let's get your café <span className="accent">its first read.</span></h1>
+          <p className="lead" style={{ maxWidth: "52ch" }}>
+            Two short steps and you're set. Tell us a little about your café and where it lives online, and we'll do the reading and send your first weekly insight back, usually within a day. It takes about two minutes, and there's nothing to set up on your end.
           </p>
         </div>
 
-        <div className="contact-grid mt-7" style={{ display: "grid", gridTemplateColumns: "0.85fr 1.15fr", gap: "var(--space-8)", alignItems: "start" }}>
+        <div className="contact-grid mt-7" style={{ display: "grid", gridTemplateColumns: "0.82fr 1.18fr", gap: "var(--space-8)", alignItems: "start" }}>
           <div className="stack gap-6">
             <div className="contact-method">
               <span className="mi"><Ico name="mail" className="" /></span>
@@ -146,6 +306,13 @@ function Contact() {
                 <span style={{ fontWeight: "var(--fw-semibold)" }}>Prefer a walkthrough?</span>
                 <span className="body" style={{ fontSize: "var(--ui-sm)" }}>We'll set up a 15-minute call and show you your café's data live.</span>
               </div>
+            </div>
+
+            <div className="side-note">
+              <span className="aside">we're café people too</span>
+              <p className="body mt-2" style={{ fontSize: "var(--ui-sm)" }}>
+                A real person reads every signup. Tell us what you're after and we'll tune the first read to it.
+              </p>
             </div>
           </div>
 

@@ -31,6 +31,8 @@ function SiteHeader({ active }) {
   const links = [
     { href: "index.html", label: "About", key: "about" },
     { href: "product.html", label: "Product", key: "product" },
+    { href: "methodology.html", label: "Methodology", key: "methodology" },
+    { href: "resources.html", label: "Resources", key: "resources" },
     { href: "contact.html", label: "Contact", key: "contact" },
   ];
   return (
@@ -73,6 +75,8 @@ function SiteFooter() {
           React.createElement("nav", { className: "footer-nav", "aria-label": "Footer" },
             React.createElement("a", { href: "index.html" }, "About"),
             React.createElement("a", { href: "product.html" }, "Product"),
+            React.createElement("a", { href: "methodology.html" }, "Methodology"),
+            React.createElement("a", { href: "resources.html" }, "Resources"),
             React.createElement("a", { href: "contact.html" }, "Contact"),
             React.createElement("a", { href: "https://instagram.com/brewinsight", target: "_blank", rel: "noopener" }, "@brewinsight")
           )

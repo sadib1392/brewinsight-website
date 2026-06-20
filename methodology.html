@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrewInsight — Methodology</title>
+
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/colors.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/typography.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/effects.css">
+<link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/styles.css">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="docs.css">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/_ds_bundle.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel">
+const { SourceBadge } = window.BrewInsightDesignSystem_a940df;
+
+/* ---------------------------------------------------------------------------
+ * Methodology — Mintlify DOCS layout adapted onto BrewInsight's brand.
+ * Pattern borrowed: 3-column doc grid (left section nav / centered prose /
+ * right "On this page" TOC), callout boxes, property-row source table.
+ * Brand kept: cream + charcoal spine, forest as the single green accent,
+ * Caveat for asides only. Mintlify's teal/mint and Geist Mono are NOT imported.
+ * ------------------------------------------------------------------------- */
+
+/* Section model drives both the sidebar nav AND the right-rail TOC, so the two
+ * never drift out of sync. */
+const SECTIONS = [
+  { id: "collect",   nav: "How we collect your data", toc: "Collecting your data" },
+  { id: "sources",   nav: "Our sources",              toc: "Our sources" },
+  { id: "validate",  nav: "Validating review counts", toc: "Validating reviews" },
+  { id: "interpret", nav: "Data vs interpretation",   toc: "Data vs interpretation" },
+  { id: "cadence",   nav: "How often it refreshes",   toc: "How often it refreshes" },
+  { id: "never",     nav: "What we will never do",    toc: "What we will never do" },
+];
+
+/* The data sources, rendered as Mintlify-style property rows. */
+const SOURCES = [
+  { ico: "star",         name: "Google",        badge: "GOOGLE",         body: "Your Business Profile rating, review volume, and the full text of each review, pulled from your public listing." },
+  { ico: "message-square", name: "Yelp",        badge: "YELP",           body: "Your Yelp rating and reviews, read the same way a guest would read them, so the themes match what people actually see." },
+  { ico: "trending-up",  name: "Google Trends", badge: "GOOGLE TRENDS",  body: "Local search interest for coffee terms, indexed 0–100, so a rise reads as a rise relative to your own city, not a raw count." },
+  { ico: "landmark",     name: "NCA",           badge: "NCA",            body: "National Coffee Association consumption and behavior reports, used only for industry-wide context, never presented as your numbers." },
+  { ico: "bar-chart-3",  name: "Statista",      badge: "STATISTA",       body: "Market-size and demographic figures for the wider coffee category, cited whenever we quote a broad industry stat." },
+  { ico: "receipt",      name: "Toast",         badge: "TOAST",          body: "If you connect Toast, your own sales mix sharpens the read. Optional, owner-controlled, and never shared or resold." },
+];
+
+function DocHead() {
+  return (
+    <section className="doc-head">
+      <div className="container">
+        <div className="doc-head__inner stack gap-4">
+          <span className="eyebrow">Methodology</span>
+          <h1 className="h1">Where every number comes from, <span className="accent">and how we check it.</span></h1>
+          <p className="lead">
+            BrewInsight only earns its place in your inbox if you can trust the figures. So here is the whole pipeline, in plain language: what we read, where it comes from, how we validate it, and the lines we will not cross.
+          </p>
+          <div className="doc-head__meta">
+            <span className="pill pill--source"><span className="lbl">SOURCES:</span> GOOGLE · YELP · GOOGLE TRENDS · NCA · STATISTA · TOAST</span>
+            <span className="aside">read this before you trust us</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Sidebar({ active }) {
+  return (
+    <aside className="doc-sidebar" aria-label="Sections">
+      <div className="doc-sidebar__section">
+        <div className="doc-sidebar__label">On this page</div>
+        <ul className="doc-nav">
+          {SECTIONS.map(s => (
+            <li key={s.id}>
+              <a href={"#" + s.id} className={"doc-nav__link" + (active === s.id ? " is-active" : "")}>{s.nav}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="doc-sidebar__section">
+        <div className="doc-sidebar__label">Keep reading</div>
+        <ul className="doc-nav">
+          <li><a href="product.html" className="doc-nav__link">Product &amp; pricing</a></li>
+          <li><a href="resources.html" className="doc-nav__link">Resources</a></li>
+          <li><a href="contact.html" className="doc-nav__link">Talk to us</a></li>
+        </ul>
+      </div>
+    </aside>
+  );
+}
+
+function Toc({ active }) {
+  return (
+    <nav className="doc-toc" aria-label="On this page">
+      <div className="doc-toc__label">On this page</div>
+      <ul>
+        {SECTIONS.map(s => (
+          <li key={s.id}>
+            <a href={"#" + s.id} className={active === s.id ? "is-active" : ""}>{s.toc}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+function Prose() {
+  return (
+    <div className="doc-prose">
+
+      <section className="doc-section" id="collect">
+        <h2 className="h2">How we collect your data</h2>
+        <p className="doc-section__lead">
+          You give us one thing: the name and city of your café. From there, we read your public profiles the same way a customer would, then keep a quiet eye on them through the week.
+        </p>
+        <p>
+          We start from your live Google Business Profile and your Yelp page. We read the rating, the review count, and the text of each review, exactly as they appear in public. Nothing is scraped from behind a login, and we never ask for your point-of-sale password.
+        </p>
+        <p>
+          If you choose to connect <strong>Toast</strong>, your own sales mix gets added to the read so a trend can be checked against what is actually selling. That step is entirely optional and you can disconnect it at any time.
+        </p>
+        <ul className="doc-list">
+          <li><span className="ck"><Ico name="check" /></span><span>Public listings only. Your rating, your review volume, your review text.</span></li>
+          <li><span className="ck"><Ico name="check" /></span><span>Local search interest, indexed against your own city rather than the whole country.</span></li>
+          <li><span className="ck"><Ico name="check" /></span><span>Optional first-party sales data, in your control, never resold.</span></li>
+        </ul>
+      </section>
+
+      <section className="doc-section" id="sources">
+        <h2 className="h2">Our sources</h2>
+        <p className="doc-section__lead">
+          Six sources, each doing one job. We keep them separate on purpose, so a number from one is never quietly blended into a claim from another.
+        </p>
+        <div className="source-grid">
+          {SOURCES.map(s => (
+            <div className="source-row" key={s.badge}>
+              <div className="source-row__name">
+                <span className="feature-ico"><Ico name={s.ico} /></span>
+                {s.name}
+              </div>
+              <div>
+                <p className="source-row__body">{s.body}</p>
+                <span className="source-row__body src-tag">
+                  <SourceBadge state="light">{s.badge}</SourceBadge>
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="body">
+          Your café's own read leans on <strong>Google</strong>, <strong>Yelp</strong>, and <strong>Google Trends</strong>. <strong>NCA</strong> and <strong>Statista</strong> only ever supply wider industry context, and we label them as such every time they appear.
+        </p>
+      </section>
+
+      <section className="doc-section" id="validate">
+        <h2 className="h2">How we validate review counts</h2>
+        <p className="doc-section__lead">
+          A review tally is only useful if it matches reality. So before we report a number, we check it against your live listing.
+        </p>
+        <p>
+          Each time we refresh, we compare the count we hold against the count showing on your public profile right now. If the two disagree, the read is held back rather than shipped with a figure we cannot stand behind. You see the validated number or you see an honest note that we are re-checking, never a silent guess.
+        </p>
+
+        <div className="callout">
+          <span className="callout__ico"><Ico name="shield-check" /></span>
+          <div>
+            <p className="callout__title">Credibility first</p>
+            <p className="callout__body">
+              Every figure in your weekly read is checked against the live listing before it goes out. <strong>If we cannot match a number to its source, we do not send it.</strong> A missing number is more honest than a confident wrong one.
+            </p>
+          </div>
+        </div>
+
+        <p>
+          This is also why your count can move between two refreshes even when no new reviews arrived: platforms remove spam and duplicate entries, and our number follows the listing down as faithfully as it follows it up.
+        </p>
+      </section>
+
+      <section className="doc-section" id="interpret">
+        <h2 className="h2">How we separate interpretation from raw data</h2>
+        <p className="doc-section__lead">
+          Two different things live in your weekly email, and we never let them blur: the raw data, and what we think you might do about it.
+        </p>
+        <p>
+          The <strong>raw data</strong> is the rating, the counts, the indexed trend lines. It always carries a source badge, and you can trace it back to Google, Yelp, or Google Trends yourself.
+        </p>
+        <p>
+          The <strong>interpretation</strong> is the part that reads "worth a seasonal special" or "reply to the reviews mentioning wait times." That is our read, not a fact, and it is always written as a suggestion you are free to ignore.
+        </p>
+        <ul className="doc-list">
+          <li><span className="ck"><Ico name="badge-check" /></span><span><strong>Data</strong> is sourced and traceable. It sits behind a source badge.</span></li>
+          <li><span className="ck"><Ico name="badge-check" /></span><span><strong>Interpretation</strong> is plainly framed as our recommendation, with the data it leans on shown right next to it.</span></li>
+        </ul>
+      </section>
+
+      <section className="doc-section" id="cadence">
+        <h2 className="h2">How often it refreshes</h2>
+        <p className="doc-section__lead">
+          Once a week, on purpose. A café does not need a dashboard buzzing at it every hour.
+        </p>
+        <p>
+          We refresh the underlying data through the week and send one short read on the same day each week. Trends are reported as a rolling movement rather than a single day's spike, so a quiet Tuesday never gets mistaken for a real shift. Industry figures from NCA and Statista update on their own slower cadence, and we note when a stat is from an older report.
+        </p>
+      </section>
+
+      <section className="doc-section" id="never">
+        <h2 className="h2">What we will never do</h2>
+        <p className="doc-section__lead">
+          The shortest section, and the one that matters most. These are commitments, not features.
+        </p>
+        <ul className="doc-list is-never">
+          <li><span className="ck"><Ico name="x-circle" /></span><span>We will never present an industry average as if it were your café's own number.</span></li>
+          <li><span className="ck"><Ico name="x-circle" /></span><span>We will never post a figure we cannot trace back to a named source.</span></li>
+          <li><span className="ck"><Ico name="x-circle" /></span><span>We will never sell, share, or repackage your data to anyone, for any reason.</span></li>
+          <li><span className="ck"><Ico name="x-circle" /></span><span>We will never dress up a guess as a fact, or hide a gap in the data behind a confident sentence.</span></li>
+        </ul>
+
+        <div className="callout callout--amber">
+          <span className="callout__ico"><Ico name="lock" /></span>
+          <div>
+            <p className="callout__title">Your data stays yours</p>
+            <p className="callout__body">
+              Connecting Toast is optional and reversible. Your sales data is used only to sharpen <strong>your own</strong> read and is never shared with other cafés, partners, or advertisers.
+            </p>
+          </div>
+        </div>
+
+        <div className="doc-prose__foot">
+          <span className="sample-note"><Ico name="coffee" />Questions about a number? We will show you exactly where it came from.</span>
+          <a className="btn btn--forest" href="contact.html">Talk to us<Ico name="arrow-right" /></a>
+        </div>
+      </section>
+
+    </div>
+  );
+}
+
+function App() {
+  useLucide();
+  /* Scroll-spy: highlight the section nearest the top of the viewport in both rails. */
+  const [active, setActive] = React.useState(SECTIONS[0].id);
+  React.useEffect(() => {
+    const ids = SECTIONS.map(s => s.id);
+    const obs = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible.length) setActive(visible[0].target.id);
+    }, { rootMargin: "-96px 0px -65% 0px", threshold: 0 });
+    ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <React.Fragment>
+      <SiteHeader active="methodology" />
+      <main>
+        <DocHead />
+        <div className="container">
+          <div className="doc-shell">
+            <Sidebar active={active} />
+            <Prose />
+            <Toc active={active} />
+          </div>
+        </div>
+      </main>
+      <SiteFooter />
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

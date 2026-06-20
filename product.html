@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/spacing.css">
 <link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/tokens/effects.css">
 <link rel="stylesheet" href="_ds/brewinsight-design-system-a940dfe7-11a2-43a0-b49f-55db9944d86d/styles.css">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="site.css?v=7">
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
@@ -22,7 +22,7 @@
 <body>
 <div id="root"></div>
 
-<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="shared.jsx?v=2"></script>
 <script type="text/babel">
 const { Eyebrow, SourceBadge, StatCard, Badge } = window.BrewInsightDesignSystem_a940df;
 
@@ -797,6 +797,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   .how-num { width: 30px; height: 30px; font-size: var(--ui-sm); }
   .faq-item { padding: var(--space-4) var(--space-5); }
   .faq-q { font-size: var(--ui-base); }
+  /* let the step columns shrink, and wrap the long URLs in the product-UI
+   * mock so they don't force the layout wider than the phone */
+  .how-step > *, .how-pair > * { min-width: 0; }
+  .how-show, .how-show * { min-width: 0; overflow-wrap: anywhere; }
 }
 </style>
 </body>

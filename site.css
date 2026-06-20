@@ -529,3 +529,95 @@ ul.check li .ck { color: var(--forest); flex: 0 0 auto; margin-top: 1px; }
   .dtable { min-width: 460px; }
   .dash__body { padding: var(--space-4); }
 }
+
+/* ---- Mobile navigation (hamburger) ---- */
+.nav__toggle {
+  display: none;
+  width: 44px; height: 44px;
+  align-items: center; justify-content: center;
+  background: transparent;
+  border: 1px solid var(--track-grey);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  cursor: pointer;
+}
+.nav__toggle svg { width: 22px; height: 22px; }
+.nav__mobile { display: none; }
+
+@media (max-width: 820px) {
+  .nav__links, .nav__cta { display: none; }
+  .nav__toggle { display: inline-flex; }
+  .nav__mobile {
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    background: var(--paper);
+    border-bottom: 1px solid var(--track-grey);
+    transition: max-height var(--dur-base) var(--ease-standard);
+  }
+  .nav__mobile.is-open { max-height: 78vh; }
+  .nav__mobile .container {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-5);
+  }
+  .nav__mobile-link {
+    padding: 15px 2px;
+    font-weight: var(--fw-medium);
+    font-size: var(--ui-lg);
+    color: var(--body-grey);
+    border-bottom: 1px solid var(--track-grey);
+  }
+  .nav__mobile-link[aria-current="page"] { color: var(--ink); font-weight: var(--fw-semibold); }
+  .nav__mobile-cta { margin-top: var(--space-4); width: 100%; }
+}
+
+/* ---- Small-phone hardening (applies site-wide) ---- */
+.footer-nav { flex-wrap: wrap; }
+@media (max-width: 520px) {
+  /* never let a wide media element force horizontal scroll */
+  img, svg, table, pre, iframe { max-width: 100%; }
+  /* tighten the universal gutter on the smallest screens */
+  .container { padding-left: var(--space-4); padding-right: var(--space-4); }
+  /* stat-row / 3-up grids that still used .grid-3 collapse fully */
+  .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  /* eyebrows are inline-flex + heavily tracked uppercase — long ones (e.g.
+   * "Insights for café owners") can't wrap and force the page wide. Tighten
+   * tracking/size on phones and allow the dash to wrap. */
+  .eyebrow { font-size: var(--ui-xs); letter-spacing: 0.12em; flex-wrap: wrap; }
+  /* let grid/flex cells shrink below their content's intrinsic width */
+  .hero-grid > *, .modules > *, .grid > *, .dash__split > * { min-width: 0; }
+}
+@media (max-width: 620px) {
+  /* footer: stack columns, wrap the link row */
+  .site-footer__inner { flex-direction: column; align-items: flex-start; gap: var(--space-5); }
+  .site-footer__inner > div:last-child { align-items: flex-start !important; text-align: left; }
+  .footer-nav { gap: var(--space-2) var(--space-4); }
+  /* long source pills wrap instead of forcing width */
+  .pill--source { white-space: normal; text-align: center; }
+}
+
+/* ---- Overflow safety + responsive media (site-wide) ---- */
+/* Guarantee no horizontal scroll anywhere. `clip` (not hidden) keeps the
+ * sticky header working while removing residual sub-pixel overflow. */
+html { overflow-x: clip; }
+/* Charts/SVGs scale down to their container instead of forcing width.
+ * Non-icon SVGs (the TrendChart, hardcoded width="460") are forced to the
+ * container width; lucide icons keep their fixed size. */
+svg:not(.lucide) { max-width: 100%; }
+.hero-card svg:not(.lucide), .dash svg:not(.lucide) { width: 100%; height: auto; }
+/* Dashboard: let grid/flex children shrink so the wide reviews table
+ * scrolls inside its own wrapper rather than forcing the card wider. */
+.dash__body, .dash__split > * { min-width: 0; }
+
+@media (max-width: 600px) {
+  /* DS components (Eyebrow, SourceBadge, footer wordmark) set letter-spacing
+   * INLINE and can't wrap, so heavily-tracked labels overflow narrow cards.
+   * Tighten inline tracking on phones so they fit. */
+  [style*="letter-spacing"] { letter-spacing: 0.06em !important; }
+  /* let card header rows + dashboard chrome wrap instead of clipping */
+  .hero-card .row { flex-wrap: wrap; row-gap: 10px; }
+  .dash__chrome { flex-wrap: wrap; row-gap: 10px; }
+  .dash__chrome .spacer { display: none; }
+}

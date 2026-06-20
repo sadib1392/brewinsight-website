@@ -28,6 +28,8 @@ function BrandLink() {
 }
 
 function SiteHeader({ active }) {
+  const { useState, useEffect } = React;
+  const [open, setOpen] = useState(false);
   const links = [
     { href: "index.html", label: "About", key: "about" },
     { href: "product.html", label: "Product", key: "product" },
@@ -35,22 +37,41 @@ function SiteHeader({ active }) {
     { href: "resources.html", label: "Resources", key: "resources" },
     { href: "contact.html", label: "Contact", key: "contact" },
   ];
+  // re-render Lucide after the hamburger icon toggles (menu <-> x)
+  useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [open]);
+  const linkEls = (cls) => links.map(l =>
+    React.createElement("a", {
+      key: l.key,
+      href: l.href,
+      className: cls,
+      "aria-current": active === l.key ? "page" : undefined,
+      onClick: () => setOpen(false),
+    }, l.label)
+  );
   return (
     React.createElement("header", { className: "site-header" },
       React.createElement("div", { className: "container site-header__inner" },
         React.createElement(BrandLink, null),
         React.createElement("nav", { className: "nav", "aria-label": "Primary" },
-          React.createElement("div", { className: "nav__links" },
-            links.map(l =>
-              React.createElement("a", {
-                key: l.key,
-                href: l.href,
-                className: "nav__link",
-                "aria-current": active === l.key ? "page" : undefined,
-              }, l.label)
-            )
+          React.createElement("div", { className: "nav__links" }, linkEls("nav__link")),
+          React.createElement("a", { className: "btn btn--forest nav__cta", href: "contact.html" },
+            "Start free trial",
+            React.createElement(Ico, { name: "arrow-right" })
           ),
-          React.createElement("a", { className: "btn btn--forest", href: "contact.html" },
+          React.createElement("button", {
+            className: "nav__toggle",
+            type: "button",
+            "aria-label": open ? "Close menu" : "Open menu",
+            "aria-expanded": open ? "true" : "false",
+            "aria-controls": "mobile-menu",
+            onClick: () => setOpen(o => !o),
+          }, React.createElement(Ico, { name: open ? "x" : "menu" }))
+        )
+      ),
+      React.createElement("div", { id: "mobile-menu", className: "nav__mobile" + (open ? " is-open" : "") },
+        React.createElement("div", { className: "container" },
+          ...linkEls("nav__mobile-link"),
+          React.createElement("a", { key: "cta", className: "btn btn--forest btn--lg nav__mobile-cta", href: "contact.html" },
             "Start free trial",
             React.createElement(Ico, { name: "arrow-right" })
           )

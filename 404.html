@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>BrewInsight — Brewing something up</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;600;800;900&display=swap">
+
+<style>
+/* Standalone holding page. Values mirror the BrewInsight design-system tokens
+ * so this stays on-brand without depending on the site's stylesheets. */
+:root {
+  --paper:        #F7F4EF;
+  --ink:          #1A1A1A;
+  --forest:       #386830;
+  --body-grey:    #595C55;
+  --track-grey:   #E6E3DA;
+  --sketch-detail:#9DB191;
+  --font-structure: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-annotation: 'Caveat', cursive;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-structure);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* faint paper grain, same recipe as the site */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* the signature corner-bracket frame */
+.frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  padding: clamp(36px, 7vw, 64px) clamp(22px, 5vw, 52px);
+  text-align: center;
+}
+.frame .corner {
+  position: absolute;
+  width: 26px; height: 26px;
+  pointer-events: none;
+}
+.frame .corner.tl { top: 0; left: 0;  border-top: 2px solid var(--ink); border-left: 2px solid var(--ink); }
+.frame .corner.tr { top: 0; right: 0; border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.frame .corner.bl { bottom: 0; left: 0;  border-bottom: 2px solid var(--ink); border-left: 2px solid var(--ink); }
+.frame .corner.br { bottom: 0; right: 0; border-bottom: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+
+/* ---- The mark ---- */
+.mark {
+  width: clamp(150px, 34vw, 190px);
+  height: auto;
+  color: var(--forest);
+  display: block;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+/* Steam: three wisps drifting up and fading, staggered into a loop. */
+.steam { opacity: 0; animation: steam 3.4s ease-in-out infinite; }
+.steam--1 { animation-delay: 0s; }
+.steam--2 { animation-delay: 0.5s; }
+.steam--3 { animation-delay: 1s; }
+
+@keyframes steam {
+  0%   { opacity: 0;    transform: translateY(3px)  scaleY(0.86); }
+  22%  { opacity: 0.85; }
+  60%  { opacity: 0.5;  }
+  100% { opacity: 0;    transform: translateY(-11px) scaleY(1.14); }
+}
+
+/* EKG: a faint resting trace with a bright pulse sweeping across it,
+ * the way a heart monitor redraws the beat over and over. */
+.ekg-ghost { opacity: 0.18; }
+.ekg-pulse {
+  stroke-dasharray: 20 100;
+  stroke-dashoffset: 120;
+  animation: ekg 2.1s linear infinite;
+}
+@keyframes ekg {
+  from { stroke-dashoffset: 120; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ---- Type ---- */
+.wordmark {
+  margin: clamp(20px, 4vw, 28px) 0 0;
+  font-size: clamp(13px, 3vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding-left: 0.34em; /* optical balance for the tracking */
+}
+
+.rule {
+  width: 46px;
+  height: 1px;
+  background: var(--sketch-detail);
+  border: 0;
+  margin: clamp(20px, 4vw, 26px) auto;
+}
+
+.message {
+  margin: 0 auto;
+  max-width: 30ch;
+  font-size: clamp(18px, 4.4vw, 23px);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.message .accent { color: var(--forest); }
+
+.aside {
+  margin: clamp(16px, 3vw, 20px) 0 0;
+  font-family: var(--font-annotation);
+  font-weight: 700;
+  font-size: clamp(19px, 4vw, 22px);
+  color: var(--body-grey);
+  line-height: 1;
+}
+
+.follow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  margin-top: clamp(24px, 5vw, 34px);
+  padding: 9px 16px;
+  border: 1px solid var(--track-grey);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--body-grey);
+  text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.follow:hover { border-color: var(--forest); color: var(--forest); }
+.follow svg { width: 14px; height: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .steam, .ekg-pulse { animation: none; }
+  .steam { opacity: 0.6; }
+  .ekg-pulse { stroke-dasharray: none; stroke-dashoffset: 0; }
+}
+</style>
+</head>
+<body>
+
+<main class="frame">
+  <span class="corner tl" aria-hidden="true"></span>
+  <span class="corner tr" aria-hidden="true"></span>
+  <span class="corner bl" aria-hidden="true"></span>
+  <span class="corner br" aria-hidden="true"></span>
+
+  <svg class="mark" viewBox="0 0 100 100" fill="none" stroke="currentColor"
+       stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+       role="img" aria-label="BrewInsight">
+    <!-- steam -->
+    <path class="steam steam--1" d="M42 30 C 38 24, 46 20, 42 14" stroke-width="2.6"></path>
+    <path class="steam steam--2" d="M52 30 C 48 24, 56 20, 52 14" stroke-width="2.6"></path>
+    <path class="steam steam--3" d="M62 30 C 58 24, 66 20, 62 14" stroke-width="2.6"></path>
+    <!-- cup -->
+    <path d="M30 40 L70 40 L66 76 C 65.4 80.4, 61.6 83.5, 57 83.5 L43 83.5 C 38.4 83.5, 34.6 80.4, 34 76 Z"></path>
+    <!-- handle -->
+    <path d="M70 46 C 82 46, 84 64, 70 66"></path>
+    <!-- pulse line: resting trace + sweeping beat -->
+    <path class="ekg-ghost" d="M36 60 L45 60 L49 50 L53 70 L57 60 L64 60" stroke-width="2.6"></path>
+    <path class="ekg-pulse" d="M36 60 L45 60 L49 50 L53 70 L57 60 L64 60" stroke-width="2.6" pathLength="100"></path>
+  </svg>
+
+  <p class="wordmark">BrewInsight</p>
+
+  <hr class="rule">
+
+  <h1 class="message">
+    We are busy brewing something up. <span class="accent">Check back later to see our concoction!</span>
+  </h1>
+
+  <p class="aside">see you soon ☕</p>
+
+  <a class="follow" href="https://instagram.com/brewinsight" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    </svg>
+    @brewinsight
+  </a>
+</main>
+
+</body>
+</html>

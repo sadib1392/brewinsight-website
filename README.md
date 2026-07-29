@@ -1,5 +1,28 @@
 # BrewInsight — Website
 
+> ## ⚠️ The site is in pre-launch lockdown
+>
+> Every real page loads `gate.js` first, which sends visitors to `splash.html`
+> (the animated "brewing something up" holding page) unless this browser has
+> been unlocked once with the access link.
+>
+> - **Unlock a device:** `https://brewinsight.io/?access=<TOKEN>` (token is in `gate.js`)
+> - **Re-lock a device:** `https://brewinsight.io/?access=out`
+>
+> The unlock is stored in that browser's `localStorage`, so it is per browser,
+> per device. Safari on iOS can clear script-set storage after ~7 days of not
+> visiting, so keep the unlock link bookmarked.
+>
+> **To go live:** delete the `<script src="gate.js">` line and the `noindex`
+> meta tag from the five page files, then delete `gate.js` and `splash.html`
+> (keep `404.html` if you still want a branded 404). Nothing else depends on them.
+>
+> **This is a curtain, not a vault.** GitHub Pages is a static host with no
+> server-side auth, so the page source is still served to anyone who asks for
+> it — a determined person can read it with JavaScript disabled. For a real
+> lock, put Cloudflare Access in front of the domain or move the pages to an
+> unguessable path.
+
 Marketing site for BrewInsight ("Insights for café owners"). Three pages — **About** (home), **Product & Pricing**, and **Contact** — built on the BrewInsight design system.
 
 Imported from a [Claude Design](https://claude.ai/design) handoff bundle on **2026-06-19**

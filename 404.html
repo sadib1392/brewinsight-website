@@ -35,10 +35,11 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html, body { height: 100%; }
+html { height: 100%; }
 
 body {
   margin: 0;
+  min-height: 100%;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-structure);
@@ -48,7 +49,6 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  overflow: hidden;
 }
 
 /* faint paper grain, same recipe as the site */
@@ -176,6 +176,105 @@ body::before {
 .follow:hover { border-color: var(--forest); color: var(--forest); }
 .follow svg { width: 14px; height: 14px; }
 
+/* ---- Launch-list signup ---- */
+.signup {
+  margin: clamp(24px, 5vw, 32px) auto 0;
+  max-width: 400px;
+}
+
+.signup__label {
+  display: block;
+  margin: 0 0 10px;
+  font-size: clamp(13px, 3vw, 14px);
+  font-weight: 600;
+  color: var(--body-grey);
+}
+
+.signup__row {
+  display: flex;
+  gap: 8px;
+}
+
+.signup__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 11px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--track-grey);
+  border-radius: 999px;
+  transition: border-color 160ms ease;
+}
+.signup__input::placeholder { color: var(--body-grey); opacity: 0.6; }
+.signup__input:hover { border-color: var(--sketch-detail); }
+.signup__input:focus { border-color: var(--forest); }
+.signup__input:focus-visible,
+.signup__btn:focus-visible { outline: 2px solid var(--forest); outline-offset: 2px; }
+
+.signup__btn {
+  flex: 0 0 auto;
+  padding: 11px 20px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--forest);
+  border: 1px solid var(--forest);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 160ms ease, opacity 160ms ease;
+}
+.signup__btn:hover { background: var(--dark-2); border-color: var(--dark-2); }
+.signup__btn[disabled] { opacity: 0.6; cursor: default; }
+
+.signup__note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--body-grey);
+}
+
+/* Honeypot: a real field, hidden from people. Bots that fill it are dropped. */
+.signup__hp {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.signup__status {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.signup__status:empty { display: none; }
+
+/* Success swaps the whole form out for the confirmation line. */
+.signup.is-done .signup__label,
+.signup.is-done .signup__row,
+.signup.is-done .signup__note { display: none; }
+/* Structure font, not the annotation face — "see you soon" directly above is
+ * already handwritten, and two script lines in a row fight each other. */
+.signup.is-done .signup__status {
+  margin-top: 0;
+  font-size: clamp(14px, 3vw, 15px);
+  font-weight: 600;
+  color: var(--forest);
+}
+
+@media (max-width: 420px) {
+  .signup__row { flex-direction: column; }
+  .signup__btn { padding: 12px 20px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .steam, .ekg-pulse { animation: none; }
   .steam { opacity: 0.6; }
@@ -217,6 +316,28 @@ body::before {
 
   <p class="aside">see you soon ☕</p>
 
+  <!-- Launch list. Posts to Web3Forms, which relays each signup as an email to
+       the address the access key below is registered to. Static host, no server
+       of our own — see the notes on the script at the bottom of this file. -->
+  <form class="signup" id="signup" action="https://api.web3forms.com/submit" method="POST">
+    <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
+    <input type="hidden" name="subject" value="New launch-list signup — brewinsight.io">
+    <input type="hidden" name="from_name" value="BrewInsight splash page">
+    <input class="signup__hp" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <label class="signup__label" for="signup-email">Want to know the moment we open?</label>
+
+    <div class="signup__row">
+      <input class="signup__input" id="signup-email" name="email" type="email"
+             required autocomplete="email" placeholder="you@yourcafe.com"
+             aria-describedby="signup-note">
+      <button class="signup__btn" type="submit">Keep me posted</button>
+    </div>
+
+    <p class="signup__note" id="signup-note">One email when we launch. No spam, and we never share your address.</p>
+    <p class="signup__status" role="status" aria-live="polite"></p>
+  </form>
+
   <a class="follow" href="https://instagram.com/brewinsight" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -226,6 +347,97 @@ body::before {
     @brewinsight
   </a>
 </main>
+
+<script>
+/* Launch-list signup.
+ *
+ * GitHub Pages is a static host, so there is nothing here that can send mail.
+ * The form posts to Web3Forms, a free relay that forwards each submission as an
+ * email to the address its access key is registered to (brewinsight@gmail.com).
+ *
+ * ── SETUP: one step, and the form is live ──────────────────────────────────
+ * Get a free access key at https://web3forms.com using brewinsight@gmail.com.
+ * They email you a UUID. Paste it into the `access_key` hidden input in the
+ * form above, replacing PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE. That is the only
+ * place it appears. The key is a public write-only token — it is safe to commit
+ * and safe to expose in page source; it cannot read past submissions.
+ *
+ * Until the key is set, the button falls back to opening the visitor's mail app
+ * addressed to brewinsight@gmail.com, so the form is never a dead end.
+ *
+ * The plain `action`/`method` on the <form> is the no-JavaScript path: it still
+ * submits, it just lands on the Web3Forms confirmation page instead of staying
+ * here. The handler below upgrades that to an inline success state.
+ */
+(function () {
+  var PLACEHOLDER = "PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE";
+  var INBOX = "brewinsight@gmail.com";
+
+  var form = document.getElementById("signup");
+  if (!form || !window.fetch) return; // no JS upgrade: the plain POST still works
+
+  var status = form.querySelector(".signup__status");
+  var button = form.querySelector(".signup__btn");
+  var email  = form.querySelector(".signup__input");
+  var keyField = form.querySelector('input[name="access_key"]');
+
+  function say(message) { status.textContent = message; }
+
+  function done(message) {
+    form.classList.add("is-done");
+    say(message);
+    if (typeof gtag === "function") {
+      gtag("event", "launch_list_signup", { method: "splash" });
+    }
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault(); // the browser has already run `required` + type=email
+
+    var key = keyField.value.trim();
+
+    // Key not filled in yet — hand off to the visitor's own mail client.
+    if (!key || key === PLACEHOLDER) {
+      window.location.href = "mailto:" + INBOX +
+        "?subject=" + encodeURIComponent("Keep me posted on the BrewInsight launch") +
+        "&body=" + encodeURIComponent("Please add " + email.value + " to the launch list.");
+      return;
+    }
+
+    button.disabled = true;
+    var label = button.textContent;
+    button.textContent = "Sending…";
+    say("");
+
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        access_key: key,
+        email: email.value,
+        subject: form.querySelector('input[name="subject"]').value,
+        from_name: form.querySelector('input[name="from_name"]').value,
+        botcheck: form.querySelector('input[name="botcheck"]').checked
+      })
+    })
+      .then(function (response) { return response.json(); })
+      .then(function (result) {
+        if (result && result.success) {
+          done("You're on the list. We'll email you the moment we open. ☕");
+        } else {
+          button.disabled = false;
+          button.textContent = label;
+          say("That didn't go through. Try again, or email us at " + INBOX + ".");
+        }
+      })
+      .catch(function () {
+        button.disabled = false;
+        button.textContent = label;
+        say("Couldn't reach us just now. Check your connection, or email " + INBOX + ".");
+      });
+  });
+})();
+</script>
 
 </body>
 </html>

@@ -17,11 +17,53 @@
 > meta tag from the five page files, then delete `gate.js` and `splash.html`
 > (keep `404.html` if you still want a branded 404). Nothing else depends on them.
 >
+> **Before you delete `splash.html`, export the launch list** — the addresses
+> only exist in the Web3Forms inbox, not in this repo. See below.
+>
 > **This is a curtain, not a vault.** GitHub Pages is a static host with no
 > server-side auth, so the page source is still served to anyone who asks for
 > it — a determined person can read it with JavaScript disabled. For a real
 > lock, put Cloudflare Access in front of the domain or move the pages to an
 > unguessable path.
+
+## Launch-list signup (splash page)
+
+`splash.html` (and its byte-identical twin `404.html`) carries an email field so
+visitors can be told when the product opens. GitHub Pages is a static host with
+no server, so the form posts to **[Web3Forms](https://web3forms.com)**, a free
+relay that forwards each submission as an email to **brewinsight@gmail.com**.
+
+### ⚠️ One setup step before it works
+
+1. Go to [web3forms.com](https://web3forms.com) and request an access key using
+   **brewinsight@gmail.com**. They email back a UUID.
+2. Paste it into the `access_key` hidden input in `splash.html`, replacing
+   `PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE`. Copy the file over `404.html` to keep
+   the two in sync.
+
+The access key is a **public, write-only token** — it is safe to commit and safe
+to expose in page source. It can only submit the form; it cannot read past
+submissions or touch the inbox.
+
+**Until the key is set, the button falls back** to opening the visitor's own mail
+app addressed to brewinsight@gmail.com, so the form is never a dead end — but
+almost nobody completes that path, so fill the key in.
+
+### How it behaves
+
+- Submits over `fetch` and swaps in an inline "You're on the list" confirmation
+  without leaving the page. A failed send re-enables the button and points the
+  visitor at the email address.
+- The `action`/`method` attributes on the `<form>` are the no-JavaScript path —
+  it still submits, it just lands on the Web3Forms confirmation page.
+- A visually-hidden `botcheck` honeypot drops bot submissions.
+- Fires a `launch_list_signup` GA event on success (the page already loads gtag).
+
+**There is no list in this repo.** Every address lives in the
+brewinsight@gmail.com inbox and in the Web3Forms dashboard — export it from
+there before retiring the splash page.
+
+---
 
 Marketing site for BrewInsight ("Insights for café owners"). Three pages — **About** (home), **Product & Pricing**, and **Contact** — built on the BrewInsight design system.
 

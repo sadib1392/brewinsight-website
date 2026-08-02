@@ -316,14 +316,14 @@ body::before {
 
   <p class="aside">see you soon ☕</p>
 
-  <!-- Launch list. Posts to Web3Forms, which relays each signup as an email to
-       the address the access key below is registered to. Static host, no server
-       of our own — see the notes on the script at the bottom of this file. -->
-  <form class="signup" id="signup" action="https://api.web3forms.com/submit" method="POST">
-    <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
-    <input type="hidden" name="subject" value="New launch-list signup — brewinsight.io">
-    <input type="hidden" name="from_name" value="BrewInsight splash page">
-    <input class="signup__hp" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <!-- Launch list. Posts to FormSubmit, which relays each signup as an email to
+       the address in the form's action below. Static host, no server of our own
+       — see the notes on the script at the bottom of this file. -->
+  <form class="signup" id="signup" action="https://formsubmit.co/brewinsight@gmail.com" method="POST">
+    <input type="hidden" name="_subject" value="New launch-list signup — brewinsight.io">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_captcha" value="false">
+    <input class="signup__hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
 
     <label class="signup__label" for="signup-email">Want to know the moment we open?</label>
 
@@ -352,25 +352,33 @@ body::before {
 /* Launch-list signup.
  *
  * GitHub Pages is a static host, so there is nothing here that can send mail.
- * The form posts to Web3Forms, a free relay that forwards each submission as an
- * email to the address its access key is registered to (brewinsight@gmail.com).
+ * The form posts to FormSubmit, a free relay that forwards each submission as
+ * an email. The destination is simply the address in the form's `action`
+ * above — brewinsight@gmail.com. There is no account and no API key.
  *
- * ── SETUP: one step, and the form is live ──────────────────────────────────
- * Get a free access key at https://web3forms.com using brewinsight@gmail.com.
- * They email you a UUID. Paste it into the `access_key` hidden input in the
- * form above, replacing PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE. That is the only
- * place it appears. The key is a public write-only token — it is safe to commit
- * and safe to expose in page source; it cannot read past submissions.
+ * ── ACTIVATION: happens once, on the first real submission ─────────────────
+ * FormSubmit emails brewinsight@gmail.com a confirmation link the first time
+ * the form is used. Click it once and the form is live permanently. Until
+ * that click, submissions bounce and the visitor sees the error state below.
+ * So: after this deploys, submit the form yourself once, then go click the
+ * link. Every relay does this — it stops the service being an open spam relay
+ * that lets anyone mail anyone.
  *
- * Until the key is set, the button falls back to opening the visitor's mail app
- * addressed to brewinsight@gmail.com, so the form is never a dead end.
+ * ── Hiding the address from scrapers ──────────────────────────────────────
+ * The inbox is in the page source, where address-harvesting bots can read it.
+ * After activating, the FormSubmit dashboard shows a hashed alias for the same
+ * inbox. Swap it into the `action` attribute above:
+ *
+ *     action="https://formsubmit.co/a1b2c3d4e5f6..."
+ *
+ * That is the only place the endpoint lives — the AJAX URL below is derived
+ * from it, so one edit moves both paths.
  *
  * The plain `action`/`method` on the <form> is the no-JavaScript path: it still
- * submits, it just lands on the Web3Forms confirmation page instead of staying
+ * submits, it just lands on the FormSubmit confirmation page instead of staying
  * here. The handler below upgrades that to an inline success state.
  */
 (function () {
-  var PLACEHOLDER = "PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE";
   var INBOX = "brewinsight@gmail.com";
 
   var form = document.getElementById("signup");
@@ -379,61 +387,54 @@ body::before {
   var status = form.querySelector(".signup__status");
   var button = form.querySelector(".signup__btn");
   var email  = form.querySelector(".signup__input");
-  var keyField = form.querySelector('input[name="access_key"]');
+
+  // Same endpoint as the no-JS path, routed through FormSubmit's JSON API so
+  // the visitor stays on the page.
+  var endpoint = form.getAttribute("action").replace("formsubmit.co/", "formsubmit.co/ajax/");
 
   function say(message) { status.textContent = message; }
 
-  function done(message) {
-    form.classList.add("is-done");
-    say(message);
-    if (typeof gtag === "function") {
-      gtag("event", "launch_list_signup", { method: "splash" });
-    }
-  }
-
   form.addEventListener("submit", function (event) {
     event.preventDefault(); // the browser has already run `required` + type=email
-
-    var key = keyField.value.trim();
-
-    // Key not filled in yet — hand off to the visitor's own mail client.
-    if (!key || key === PLACEHOLDER) {
-      window.location.href = "mailto:" + INBOX +
-        "?subject=" + encodeURIComponent("Keep me posted on the BrewInsight launch") +
-        "&body=" + encodeURIComponent("Please add " + email.value + " to the launch list.");
-      return;
-    }
 
     button.disabled = true;
     var label = button.textContent;
     button.textContent = "Sending…";
     say("");
 
-    fetch("https://api.web3forms.com/submit", {
+    function failed(message) {
+      button.disabled = false;
+      button.textContent = label;
+      say(message);
+    }
+
+    fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
       body: JSON.stringify({
-        access_key: key,
         email: email.value,
-        subject: form.querySelector('input[name="subject"]').value,
-        from_name: form.querySelector('input[name="from_name"]').value,
-        botcheck: form.querySelector('input[name="botcheck"]').checked
+        _subject: form.querySelector('input[name="_subject"]').value,
+        _template: "table",
+        _captcha: "false",
+        _honey: form.querySelector('input[name="_honey"]').value
       })
     })
       .then(function (response) { return response.json(); })
       .then(function (result) {
-        if (result && result.success) {
-          done("You're on the list. We'll email you the moment we open. ☕");
-        } else {
-          button.disabled = false;
-          button.textContent = label;
-          say("That didn't go through. Try again, or email us at " + INBOX + ".");
+        // FormSubmit reports success as the string "true", not a boolean.
+        var ok = result && (result.success === true || result.success === "true");
+        if (!ok) {
+          failed("That didn't go through. Try again, or email us at " + INBOX + ".");
+          return;
+        }
+        form.classList.add("is-done");
+        say("You're on the list. We'll email you the moment we open. ☕");
+        if (typeof gtag === "function") {
+          gtag("event", "launch_list_signup", { method: "splash" });
         }
       })
       .catch(function () {
-        button.disabled = false;
-        button.textContent = label;
-        say("Couldn't reach us just now. Check your connection, or email " + INBOX + ".");
+        failed("Couldn't reach us just now. Check your connection, or email " + INBOX + ".");
       });
   });
 })();

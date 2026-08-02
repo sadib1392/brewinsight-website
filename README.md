@@ -18,7 +18,7 @@
 > (keep `404.html` if you still want a branded 404). Nothing else depends on them.
 >
 > **Before you delete `splash.html`, export the launch list** — the addresses
-> only exist in the Web3Forms inbox, not in this repo. See below.
+> only exist in the brewinsight@gmail.com inbox, not in this repo. See below.
 >
 > **This is a curtain, not a vault.** GitHub Pages is a static host with no
 > server-side auth, so the page source is still served to anyone who asks for
@@ -30,38 +30,53 @@
 
 `splash.html` (and its byte-identical twin `404.html`) carries an email field so
 visitors can be told when the product opens. GitHub Pages is a static host with
-no server, so the form posts to **[Web3Forms](https://web3forms.com)**, a free
+no server, so the form posts to **[FormSubmit](https://formsubmit.co)**, a free
 relay that forwards each submission as an email to **brewinsight@gmail.com**.
 
-### ⚠️ One setup step before it works
+There is no account and no API key. The destination is just the address in the
+form's `action`:
 
-1. Go to [web3forms.com](https://web3forms.com) and request an access key using
-   **brewinsight@gmail.com**. They email back a UUID.
-2. Paste it into the `access_key` hidden input in `splash.html`, replacing
-   `PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE`. Copy the file over `404.html` to keep
-   the two in sync.
+```html
+<form action="https://formsubmit.co/brewinsight@gmail.com" method="POST">
+```
 
-The access key is a **public, write-only token** — it is safe to commit and safe
-to expose in page source. It can only submit the form; it cannot read past
-submissions or touch the inbox.
+### ⚠️ Activate it once, on the first submission
 
-**Until the key is set, the button falls back** to opening the visitor's own mail
-app addressed to brewinsight@gmail.com, so the form is never a dead end — but
-almost nobody completes that path, so fill the key in.
+FormSubmit emails brewinsight@gmail.com a confirmation link the first time the
+form is used. **Click it once and the form is live permanently.** Until that
+click, submissions bounce and the visitor sees the error state.
+
+So after this deploys: open the splash page, submit your own address, then open
+brewinsight@gmail.com and click the link. Every form-to-email relay does this —
+it is what stops the service being an open relay that lets anyone mail anyone.
+
+### Hiding the inbox from scrapers
+
+The address sits in the page source, where address-harvesting bots can read it.
+Once activated, the FormSubmit dashboard shows a **hashed alias** pointing at the
+same inbox. Swap it into the `action`:
+
+```html
+<form action="https://formsubmit.co/a1b2c3d4e5f6..." method="POST">
+```
+
+That attribute is the only place the endpoint lives — the AJAX URL is derived
+from it in the script — so one edit moves both the JS and no-JS paths. Copy
+`splash.html` over `404.html` afterward to keep the two in sync.
 
 ### How it behaves
 
-- Submits over `fetch` and swaps in an inline "You're on the list" confirmation
-  without leaving the page. A failed send re-enables the button and points the
-  visitor at the email address.
+- Submits over `fetch` to FormSubmit's JSON API and swaps in an inline "You're on
+  the list" confirmation without leaving the page. A failed send re-enables the
+  button and points the visitor at the email address.
 - The `action`/`method` attributes on the `<form>` are the no-JavaScript path —
-  it still submits, it just lands on the Web3Forms confirmation page.
-- A visually-hidden `botcheck` honeypot drops bot submissions.
+  it still submits, it just lands on the FormSubmit confirmation page.
+- A visually-hidden `_honey` honeypot drops bot submissions.
 - Fires a `launch_list_signup` GA event on success (the page already loads gtag).
 
 **There is no list in this repo.** Every address lives in the
-brewinsight@gmail.com inbox and in the Web3Forms dashboard — export it from
-there before retiring the splash page.
+brewinsight@gmail.com inbox — the signups *are* the emails, so archive them into
+a label rather than deleting them, and export before retiring the splash page.
 
 ---
 

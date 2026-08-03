@@ -42,6 +42,11 @@ const KEYS = [
   { t: 1.0, rise: 0.075, scale: 1.35, opacity: 0.0 },
 ];
 
+/* The wisps read heavier on screen than they did in Blender, so the whole
+ * opacity curve is scaled down. Kept as a multiplier rather than edited into
+ * KEYS above, so those stay the handoff's own numbers. */
+const STEAM_OPACITY = 0.5;
+
 /* Which materials read as light sources. Values are the .blend's own colours. */
 const EMISSIVE = {
   forest_green: { color: 0x88c048, intensity: 1.1 }, // pulse line + green light
@@ -229,7 +234,7 @@ export async function init(container, opts = {}) {
       const s = sampleWisp(t);
       w.node.position.y = s.rise;
       w.node.scale.setScalar(w.base * s.scale);
-      if (w.material) w.material.opacity = s.opacity;
+      if (w.material) w.material.opacity = s.opacity * STEAM_OPACITY;
     }
 
     lcdFrame = (Math.floor(elapsed * LCD.FPS) % LCD.TOTAL_FRAMES) + 1;

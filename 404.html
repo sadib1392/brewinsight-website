@@ -71,6 +71,10 @@
   --glow-far:        26px;
   --glow-color:      rgba(56, 104, 48, 0.20);
   --glow-color-soft: rgba(56, 104, 48, 0.10);
+
+  /* motes drifting along the grid lines */
+  --flow-color: rgba(56, 104, 48, 0.70);
+  --flow-alpha: 0.40;
 }
 
 /* Deep green is the brand's only dark surface — never black. Lime is the
@@ -94,6 +98,9 @@
     --glow-far:        40px;
     --glow-color:      rgba(136, 192, 72, 0.42);
     --glow-color-soft: rgba(136, 192, 72, 0.22);
+
+    --flow-color: rgba(136, 192, 72, 0.85);
+    --flow-alpha: 0.50;
   }
 }
 
@@ -131,6 +138,15 @@ body::before {
   z-index: 0;
   opacity: var(--grain-opacity);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Motes travelling the grid lines. Sits above the flat grid and grain but
+ * behind all content, so it never competes with the copy. */
+#grid-flow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .frame {
@@ -220,27 +236,28 @@ body::before {
   line-height: 1;
 }
 
+/* Icon only. 44px keeps it a comfortable touch target; the accessible name
+ * lives on the anchor's aria-label since there is no longer any text. */
 .follow {
   display: inline-flex;
   align-items: center;
-  gap: 0.45em;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   margin-top: clamp(24px, 5vw, 34px);
-  padding: 9px 16px;
   border: 1px solid var(--pill-border);
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--pill-text);
   text-decoration: none;
   transition: border-color 160ms ease, color 160ms ease;
 }
 .follow:hover { border-color: var(--accent); color: var(--accent); }
-.follow svg { width: 14px; height: 14px; }
+.follow svg { width: 19px; height: 19px; }
 </style>
 </head>
 <body>
+
+<canvas id="grid-flow" aria-hidden="true"></canvas>
 
 <main class="frame">
   <span class="corner tl" aria-hidden="true"></span>
@@ -260,15 +277,103 @@ body::before {
 
   <p class="aside">see you soon ☕</p>
 
-  <a class="follow" href="https://instagram.com/brewinsight" target="_blank" rel="noopener">
+  <a class="follow" href="https://instagram.com/brewinsight" target="_blank" rel="noopener"
+     aria-label="BrewInsight on Instagram" title="@brewinsight">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
     </svg>
-    @brewinsight
   </a>
 </main>
+
+<script type="module">
+/* Little squares drifting along the grid lines. Deliberately sparse and slow:
+ * ambient texture, not something to watch. Colour and strength come from the
+ * themed --flow-* variables, so it follows light/dark automatically. */
+(() => {
+  const canvas = document.getElementById('grid-flow');
+  if (!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let pitch = 28;
+  let color = 'rgba(56, 104, 48, 0.55)';
+  let peak = 0.3;
+  let w = 0;
+  let h = 0;
+  let motes = [];
+
+  function readTheme() {
+    const s = getComputedStyle(document.documentElement);
+    pitch = parseFloat(s.getPropertyValue('--grid-size')) || pitch;
+    color = s.getPropertyValue('--flow-color').trim() || color;
+    peak = parseFloat(s.getPropertyValue('--flow-alpha')) || peak;
+  }
+
+  function make() {
+    const horizontal = Math.random() < 0.5;
+    const span = horizontal ? w : h;
+    const across = horizontal ? h : w;
+    return {
+      horizontal,
+      dir: Math.random() < 0.5 ? 1 : -1,
+      lane: Math.round((Math.random() * across) / pitch) * pitch, // ride a grid line
+      pos: Math.random() * span, // start scattered rather than all at one edge
+      speed: 45 + Math.random() * 85,
+      size: 2 + Math.random() * 2.5,
+      span,
+    };
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.max(6, Math.min(16, Math.round((w * h) / 110000)));
+    motes = Array.from({ length: count }, make);
+  }
+
+  let last = performance.now();
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min((now - last) / 1000, 0.1);
+    last = now;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 7;
+
+    for (const m of motes) {
+      m.pos += m.speed * m.dir * dt;
+      if (m.pos < -40 || m.pos > m.span + 40) {
+        const next = make();
+        next.pos = next.dir > 0 ? -20 : next.span + 20;
+        Object.assign(m, next);
+      }
+      // fade in and out at the edges so nothing pops in or out
+      const edge = Math.min(m.pos, m.span - m.pos);
+      ctx.globalAlpha = peak * Math.max(0, Math.min(1, edge / 90));
+      const x = m.horizontal ? m.pos : m.lane;
+      const y = m.horizontal ? m.lane : m.pos;
+      ctx.fillRect(x - m.size / 2, y - m.size / 2, m.size, m.size);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  readTheme();
+  resize();
+  window.addEventListener('resize', resize);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTheme);
+  requestAnimationFrame(frame);
+})();
+</script>
 
 <script type="module">
   const stage = document.getElementById('stage');
@@ -276,7 +381,7 @@ body::before {
 
   /* Root-relative on purpose: this same markup is served as 404.html from
    * arbitrary paths, where a './' specifier would resolve to the wrong place. */
-  import('/assets/3d/splash-3d.js?v=9')
+  import('/assets/3d/splash-3d.js?v=10')
     .then((mod) => mod.init(stage, { animate: !reduceMotion }))
     .then((scene) => {
       window.brewinsight3D = scene; // introspection handle

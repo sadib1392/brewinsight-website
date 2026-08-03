@@ -9,9 +9,13 @@
  *   3. terminal LCD  — a live canvas texture from brewinsight-lcd.js, because
  *                      glTF has no image-sequence support
  *
- * Progressive enhancement: the caller keeps the inline SVG mark visible until
- * init() resolves. Any failure (no WebGL, network, parse) rejects and the SVG
- * simply stays — a visitor never sees a broken state.
+ * The luminous parts (screen, pulse line, indicator lights) are made emissive
+ * so they read as lit; the outward halo is a CSS drop-shadow on the canvas
+ * (see splash.html), which keeps the background transparent. Postprocessing
+ * bloom was tried and rejected — it forces canvas alpha to 1.
+ *
+ * init() rejects if WebGL or the model is unavailable; the caller collapses
+ * the stage rather than showing an empty box.
  */
 
 import * as THREE from 'three';
@@ -38,6 +42,13 @@ const KEYS = [
   { t: 1.0, rise: 0.075, scale: 1.35, opacity: 0.0 },
 ];
 
+/* Which materials read as light sources. Values are the .blend's own colours. */
+const EMISSIVE = {
+  forest_green: { color: 0x88c048, intensity: 1.1 }, // pulse line + green light
+  amber_signal: { color: 0xc77f3b, intensity: 1.0 },
+  red_signal: { color: 0xa51404, intensity: 1.0 },
+};
+
 /* Blender eased these with Bézier; smoothstep is close enough (HANDOFF.md). */
 function sampleWisp(t) {
   for (let i = 0; i < KEYS.length - 1; i++) {
@@ -59,6 +70,7 @@ function sampleWisp(t) {
 const MUG_REVOLUTION_SECONDS = 15;
 
 export async function init(container, opts = {}) {
+  const animate = opts.animate !== false;
   const modelUrl = opts.modelUrl || new URL('./brewinsight-calc.glb', import.meta.url).href;
 
   const renderer = new THREE.WebGLRenderer({
@@ -69,7 +81,8 @@ export async function init(container, opts = {}) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.0;
+  renderer.setClearColor(0x000000, 0); // the page's grid shows through
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 100);
@@ -97,7 +110,7 @@ export async function init(container, opts = {}) {
   lcdTexture.magFilter = THREE.NearestFilter; // keep the hard LCD pixels
   /* No mipmaps. The screen draws at roughly a third of the texture's 960x640,
    * and mipmapping averages the 1px LCD strokes away to near-white — the text
-   * disappears. Sampling the full-res texture keeps it legible. */
+   * disappears. Sampling full-res keeps it legible. */
   lcdTexture.minFilter = THREE.LinearFilter;
   lcdTexture.generateMipmaps = false;
   // The screen's UVs want the canvas the right way up; verified on-model.
@@ -113,10 +126,26 @@ export async function init(container, opts = {}) {
     });
   }
   if (screenFace) {
-    screenFace.material.map = lcdTexture;
-    screenFace.material.color.set(LCD.TINT); // base colour multiplies the texture
-    screenFace.material.needsUpdate = true;
+    const m = screenFace.material;
+    m.map = lcdTexture;
+    m.color.set(LCD.TINT); // base colour multiplies the texture
+    /* Backlight: the same canvas drives emission, so the lit background glows
+     * and the black text stays dark, the way a real LCD reads. */
+    m.emissive = new THREE.Color(LCD.TINT);
+    m.emissiveMap = lcdTexture;
+    m.emissiveIntensity = 0.3;
+    m.needsUpdate = true;
   }
+
+  /* --- make the light sources actually emit --- */
+  model.traverse((o) => {
+    const m = o.material;
+    if (!m || !EMISSIVE[m.name]) return;
+    const g = EMISSIVE[m.name];
+    m.emissive = new THREE.Color(g.color);
+    m.emissiveIntensity = g.intensity;
+    m.needsUpdate = true;
+  });
 
   /* --- steam: glTF exports these opaque at alpha 1, so make them blendable --- */
   const wisps = [];
@@ -150,6 +179,14 @@ export async function init(container, opts = {}) {
   const center = box.getCenter(new THREE.Vector3());
   const viewDir = new THREE.Vector3(0.26, 0.14, 1).normalize();
 
+  /* --- on the glow ---
+   * No EffectComposer/UnrealBloomPass here, deliberately. Its final composite
+   * blends additively onto the read buffer and drives alpha to 1 across the
+   * whole frame, so the canvas came back opaque black and buried the page's
+   * grid behind a rectangle. Instead the luminous materials emit (above), and
+   * the outward halo is a CSS drop-shadow on the canvas, which keeps the
+   * background genuinely transparent. See .stage canvas in splash.html. */
+
   function frameCamera() {
     const w = container.clientWidth || 1;
     const h = container.clientHeight || 1;
@@ -178,7 +215,6 @@ export async function init(container, opts = {}) {
   const clock = new THREE.Clock();
   let elapsed = 0;
   let running = true;
-
   let lcdFrame = 1;
 
   /** Advance the scene by dt seconds and draw. Split out from the rAF loop so
@@ -211,11 +247,11 @@ export async function init(container, opts = {}) {
     advance(Math.min(clock.getDelta(), 0.1));
   }
 
-  // draw one frame before handing back, so the swap-in never shows an empty canvas
-  lcd.draw(1);
-  lcdTexture.needsUpdate = true;
-  renderer.render(scene, camera);
-  requestAnimationFrame(tick);
+  /* Draw a first frame before handing back so the fade-in never shows an empty
+   * canvas. With reduced motion that single frame is all there is. */
+  advance(animate ? 0 : 6);
+
+  if (animate) requestAnimationFrame(tick);
 
   return {
     /* Small introspection hook, handy for verifying the scene is actually live. */
@@ -225,6 +261,7 @@ export async function init(container, opts = {}) {
       lcdFrame,
       wispOpacities: wisps.map((w) => (w.material ? +w.material.opacity.toFixed(2) : null)),
       screenTextureBound: !!(screenFace && screenFace.material.map === lcdTexture),
+      animating: animate,
     }),
     /* Step the scene by hand (seconds). Used to verify the animation without
      * depending on rAF, which browsers suspend for hidden documents. */

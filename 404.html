@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-B1BYV6BBY8"></script>
 <script>
@@ -32,16 +33,68 @@
 /* Standalone holding page. Values mirror the BrewInsight design-system tokens
  * so this stays on-brand without depending on the site's stylesheets. */
 :root {
+  /* palette */
   --paper:        #F7F4EF;
   --ink:          #1A1A1A;
   --forest:       #386830;
+  --lime:         #88C048;
+  --deep-green:   #1B2E1A;
   --body-grey:    #595C55;
   --track-grey:   #E6E3DA;
   --sketch-detail:#9DB191;
+  --dark-3:       #5A7A4A;
+  --dark-text:    #9FB094;
+
   --font-structure: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   --font-annotation: 'Caveat', cursive;
+
   /* how far the corner crop-marks sit in from the screen edge */
   --frame-gap: clamp(14px, 2.2vw, 28px);
+
+  /* themed roles — overridden wholesale in dark mode below */
+  --bg:          var(--paper);
+  --fg:          var(--ink);
+  --accent:      var(--forest);
+  --crop-mark:   var(--ink);
+  --rule-color:  var(--sketch-detail);
+  --pill-border: var(--track-grey);
+  --pill-text:   var(--body-grey);
+  --aside-color: var(--body-grey);
+
+  /* the brand's graph-paper grid */
+  --grid-line:    rgba(56, 104, 48, 0.07);
+  --grid-size:    28px;
+  --grain-opacity: 0.04;
+
+  /* glow thrown by the 3D scene; restrained on cream */
+  --glow-near:       10px;
+  --glow-far:        26px;
+  --glow-color:      rgba(56, 104, 48, 0.20);
+  --glow-color-soft: rgba(56, 104, 48, 0.10);
+}
+
+/* Deep green is the brand's only dark surface — never black. Lime is the
+ * dark-surface accent (it fails contrast on cream, so it appears only here). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:          var(--deep-green);
+    --fg:          var(--paper);
+    --accent:      var(--lime);
+    --crop-mark:   rgba(247, 244, 239, 0.82);
+    --rule-color:  var(--dark-3);
+    --pill-border: rgba(247, 244, 239, 0.22);
+    --pill-text:   var(--dark-text);
+    --aside-color: var(--dark-text);
+
+    --grid-line:    rgba(136, 192, 72, 0.10);
+    --grain-opacity: 0.05;
+
+    /* lime carries the glow on the dark surface, and it can go further */
+    --glow-near:       14px;
+    --glow-far:        40px;
+    --glow-color:      rgba(136, 192, 72, 0.42);
+    --glow-color-soft: rgba(136, 192, 72, 0.22);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -50,8 +103,7 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
+  color: var(--fg);
   font-family: var(--font-structure);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -61,6 +113,13 @@ body {
   padding: 24px;
   overflow-x: hidden;
   overflow-y: auto;
+
+  /* graph-paper grid over the flat ground, same recipe as .bi-graph-paper */
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
 }
 
 /* faint paper grain, same recipe as the site */
@@ -70,11 +129,10 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.04;
+  opacity: var(--grain-opacity);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* the signature corner-bracket frame */
 .frame {
   position: relative;
   z-index: 1;
@@ -83,6 +141,7 @@ body::before {
   padding: clamp(26px, 4.5vw, 44px) clamp(22px, 5vw, 52px);
   text-align: center;
 }
+
 /* Fixed to the viewport corners rather than the content column, so the marks
  * crop the whole screen, held off the edge by --frame-gap. */
 .frame .corner {
@@ -92,67 +151,33 @@ body::before {
   pointer-events: none;
   z-index: 2;
 }
-.frame .corner.tl { top: var(--frame-gap); left: var(--frame-gap);  border-top: 2px solid var(--ink); border-left: 2px solid var(--ink); }
-.frame .corner.tr { top: var(--frame-gap); right: var(--frame-gap); border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
-.frame .corner.bl { bottom: var(--frame-gap); left: var(--frame-gap);  border-bottom: 2px solid var(--ink); border-left: 2px solid var(--ink); }
-.frame .corner.br { bottom: var(--frame-gap); right: var(--frame-gap); border-bottom: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.frame .corner.tl { top: var(--frame-gap); left: var(--frame-gap);  border-top: 2px solid var(--crop-mark); border-left: 2px solid var(--crop-mark); }
+.frame .corner.tr { top: var(--frame-gap); right: var(--frame-gap); border-top: 2px solid var(--crop-mark); border-right: 2px solid var(--crop-mark); }
+.frame .corner.bl { bottom: var(--frame-gap); left: var(--frame-gap);  border-bottom: 2px solid var(--crop-mark); border-left: 2px solid var(--crop-mark); }
+.frame .corner.br { bottom: var(--frame-gap); right: var(--frame-gap); border-bottom: 2px solid var(--crop-mark); border-right: 2px solid var(--crop-mark); }
 
-/* ---- The stage: 3D scene, with the flat mark underneath as the fallback ----
- * The SVG paints instantly and stays put; the WebGL canvas fades in over it
- * only once the model has actually loaded and rendered a frame. If WebGL is
- * missing, the network fails, or motion is reduced, the SVG is simply what
- * you get and nothing looks broken. */
+/* ---- The 3D stage ----
+ * The scene is the only mark on this page. It fades in once the model has
+ * loaded and drawn; if WebGL is unavailable the stage collapses so the copy
+ * closes up rather than leaving a hole. */
 .stage {
   position: relative;
   width: 100%;
   height: clamp(340px, 58vh, 560px);
-}
-.stage__3d {
-  position: absolute;
-  inset: 0;
   opacity: 0;
-  transition: opacity 700ms var(--ease, ease);
+  transition: opacity 700ms ease;
 }
-.stage.is-3d .stage__3d { opacity: 1; }
+.stage.is-ready { opacity: 1; }
+.stage.is-unavailable { display: none; }
 
-.mark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(150px, 34vw, 190px);
-  height: auto;
-  color: var(--forest);
-  display: block;
-  overflow: visible;
-  transition: opacity 400ms ease;
-}
-.stage.is-3d .mark { opacity: 0; pointer-events: none; }
-
-/* Steam: three wisps drifting up and fading, staggered into a loop. */
-.steam { opacity: 0; animation: steam 3.4s ease-in-out infinite; }
-.steam--1 { animation-delay: 0s; }
-.steam--2 { animation-delay: 0.5s; }
-.steam--3 { animation-delay: 1s; }
-
-@keyframes steam {
-  0%   { opacity: 0;    transform: translateY(3px)  scaleY(0.86); }
-  22%  { opacity: 0.85; }
-  60%  { opacity: 0.5;  }
-  100% { opacity: 0;    transform: translateY(-11px) scaleY(1.14); }
-}
-
-/* EKG: a faint resting trace with a bright pulse sweeping across it,
- * the way a heart monitor redraws the beat over and over. */
-.ekg-ghost { opacity: 0.18; }
-.ekg-pulse {
-  stroke-dasharray: 20 100;
-  stroke-dashoffset: 120;
-  animation: ekg 2.1s linear infinite;
-}
-@keyframes ekg {
-  from { stroke-dashoffset: 120; }
-  to   { stroke-dashoffset: 0; }
+/* The glow. Emissive materials make the screen, pulse line and indicator
+ * lights read as lit; this drop-shadow throws the halo outward. Done in CSS
+ * rather than a WebGL bloom pass so the canvas stays transparent and the grid
+ * still reads behind it. */
+.stage canvas {
+  filter:
+    drop-shadow(0 0 var(--glow-near) var(--glow-color))
+    drop-shadow(0 0 var(--glow-far) var(--glow-color-soft));
 }
 
 /* ---- Type ---- */
@@ -162,14 +187,14 @@ body::before {
   font-weight: 600;
   letter-spacing: 0.34em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--fg);
   padding-left: 0.34em; /* optical balance for the tracking */
 }
 
 .rule {
   width: 46px;
   height: 1px;
-  background: var(--sketch-detail);
+  background: var(--rule-color);
   border: 0;
   margin: clamp(20px, 4vw, 26px) auto;
 }
@@ -181,17 +206,17 @@ body::before {
   font-weight: 800;
   line-height: 1.3;
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: var(--fg);
   text-wrap: balance;
 }
-.message .accent { color: var(--forest); }
+.message .accent { color: var(--accent); }
 
 .aside {
   margin: clamp(16px, 3vw, 20px) 0 0;
   font-family: var(--font-annotation);
   font-weight: 700;
   font-size: clamp(19px, 4vw, 22px);
-  color: var(--body-grey);
+  color: var(--aside-color);
   line-height: 1;
 }
 
@@ -201,24 +226,18 @@ body::before {
   gap: 0.45em;
   margin-top: clamp(24px, 5vw, 34px);
   padding: 9px 16px;
-  border: 1px solid var(--track-grey);
+  border: 1px solid var(--pill-border);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--body-grey);
+  color: var(--pill-text);
   text-decoration: none;
   transition: border-color 160ms ease, color 160ms ease;
 }
-.follow:hover { border-color: var(--forest); color: var(--forest); }
+.follow:hover { border-color: var(--accent); color: var(--accent); }
 .follow svg { width: 14px; height: 14px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .steam, .ekg-pulse { animation: none; }
-  .steam { opacity: 0.6; }
-  .ekg-pulse { stroke-dasharray: none; stroke-dashoffset: 0; }
-}
 </style>
 </head>
 <body>
@@ -229,25 +248,7 @@ body::before {
   <span class="corner bl" aria-hidden="true"></span>
   <span class="corner br" aria-hidden="true"></span>
 
-  <div class="stage">
-  <div class="stage__3d" id="stage-3d" aria-hidden="true"></div>
-
-  <svg class="mark" viewBox="0 0 100 100" fill="none" stroke="currentColor"
-       stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
-       role="img" aria-label="BrewInsight">
-    <!-- steam -->
-    <path class="steam steam--1" d="M42 30 C 38 24, 46 20, 42 14" stroke-width="2.6"></path>
-    <path class="steam steam--2" d="M52 30 C 48 24, 56 20, 52 14" stroke-width="2.6"></path>
-    <path class="steam steam--3" d="M62 30 C 58 24, 66 20, 62 14" stroke-width="2.6"></path>
-    <!-- cup -->
-    <path d="M30 40 L70 40 L66 76 C 65.4 80.4, 61.6 83.5, 57 83.5 L43 83.5 C 38.4 83.5, 34.6 80.4, 34 76 Z"></path>
-    <!-- handle -->
-    <path d="M70 46 C 82 46, 84 64, 70 66"></path>
-    <!-- pulse line: resting trace + sweeping beat -->
-    <path class="ekg-ghost" d="M36 60 L45 60 L49 50 L53 70 L57 60 L64 60" stroke-width="2.6"></path>
-    <path class="ekg-pulse" d="M36 60 L45 60 L49 50 L53 70 L57 60 L64 60" stroke-width="2.6" pathLength="100"></path>
-  </svg>
-  </div>
+  <div class="stage" id="stage" role="img" aria-label="A slowly turning BrewInsight mug beside a terminal reading out café data"></div>
 
   <p class="wordmark">BrewInsight</p>
 
@@ -270,26 +271,23 @@ body::before {
 </main>
 
 <script type="module">
-  /* Progressive enhancement: the flat mark above is already on screen. Only
-   * swap in the Blender scene once it has genuinely loaded and drawn. Any
-   * failure leaves the SVG in place. */
-  const stage = document.getElementById('stage-3d');
-  const wrap = document.querySelector('.stage');
+  const stage = document.getElementById('stage');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (stage && !reduceMotion) {
-    /* Root-relative on purpose: this same markup is served as 404.html from
-     * arbitrary paths, where a './' specifier would resolve to the wrong place. */
-    import('/assets/3d/splash-3d.js?v=6')
-      .then((mod) => mod.init(stage))
-      .then((scene) => {
-        window.brewinsight3D = scene; // introspection handle
-        wrap.classList.add('is-3d');
-      })
-      .catch((err) => {
-        console.warn('[splash] 3D scene unavailable, keeping the flat mark.', err);
-      });
-  }
+  /* Root-relative on purpose: this same markup is served as 404.html from
+   * arbitrary paths, where a './' specifier would resolve to the wrong place. */
+  import('/assets/3d/splash-3d.js?v=9')
+    .then((mod) => mod.init(stage, { animate: !reduceMotion }))
+    .then((scene) => {
+      window.brewinsight3D = scene; // introspection handle
+      stage.classList.add('is-ready');
+    })
+    .catch((err) => {
+      /* No WebGL, or the model failed to load. Collapse the stage so the page
+       * closes up cleanly instead of showing an empty box. */
+      stage.classList.add('is-unavailable');
+      console.warn('[splash] 3D scene unavailable.', err);
+    });
 </script>
 
 </body>

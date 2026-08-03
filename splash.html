@@ -78,7 +78,7 @@ body::before {
   z-index: 1;
   width: 100%;
   max-width: 560px;
-  padding: clamp(36px, 7vw, 64px) clamp(22px, 5vw, 52px);
+  padding: clamp(26px, 4.5vw, 44px) clamp(22px, 5vw, 52px);
   text-align: center;
 }
 .frame .corner {
@@ -99,7 +99,7 @@ body::before {
 .stage {
   position: relative;
   width: 100%;
-  height: clamp(250px, 42vh, 380px);
+  height: clamp(340px, 58vh, 560px);
 }
 .stage__3d {
   position: absolute;
@@ -274,7 +274,7 @@ body::before {
   if (stage && !reduceMotion) {
     /* Root-relative on purpose: this same markup is served as 404.html from
      * arbitrary paths, where a './' specifier would resolve to the wrong place. */
-    import('/assets/3d/splash-3d.js?v=5')
+    import('/assets/3d/splash-3d.js?v=6')
       .then((mod) => mod.init(stage))
       .then((scene) => {
         window.brewinsight3D = scene; // introspection handle

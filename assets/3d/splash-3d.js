@@ -135,11 +135,14 @@ export async function init(container, opts = {}) {
 
   const mugSpin = model.getObjectByName('mug_spin');
 
-  /* Put the steam at lifecycle start before measuring, so framing isn't thrown
-   * off by wherever the wisps happened to sit on the export frame. */
+  /* Measure with the wisps at their FULL extent (end of the lifecycle: highest
+   * rise, largest scale), not wherever they sat on the export frame. Measuring
+   * at lifecycle start yields a box that is too short and the risen steam gets
+   * cropped off the top of frame. */
+  const peak = KEYS[KEYS.length - 1];
   for (const w of wisps) {
-    w.node.position.y = 0;
-    w.node.scale.setScalar(w.base * KEYS[0].scale);
+    w.node.position.y = peak.rise;
+    w.node.scale.setScalar(w.base * peak.scale);
   }
 
   const box = new THREE.Box3().setFromObject(model);
@@ -152,10 +155,11 @@ export async function init(container, opts = {}) {
     const h = container.clientHeight || 1;
     camera.aspect = w / h;
     const vFov = THREE.MathUtils.degToRad(camera.fov);
-    // extra vertical room so risen steam stays in shot
-    const fitH = (size.y * 1.14) / (2 * Math.tan(vFov / 2));
+    /* The box already includes fully risen steam, so this only needs a hair of
+     * breathing room rather than a fudge factor. */
+    const fitH = size.y / (2 * Math.tan(vFov / 2));
     const fitW = size.x / (2 * Math.tan(vFov / 2) * camera.aspect);
-    const dist = Math.max(fitH, fitW) * 1.02;
+    const dist = Math.max(fitH, fitW) * 1.03;
     camera.position.copy(center).addScaledVector(viewDir, dist);
     camera.lookAt(center);
     camera.updateProjectionMatrix();

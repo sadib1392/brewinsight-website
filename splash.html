@@ -19,6 +19,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;600;800;900&display=swap">
 
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+  }
+}
+</script>
+
 <style>
 /* Standalone holding page. Values mirror the BrewInsight design-system tokens
  * so this stays on-brand without depending on the site's stylesheets. */
@@ -48,7 +57,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* faint paper grain, same recipe as the site */
@@ -81,15 +91,37 @@ body::before {
 .frame .corner.bl { bottom: 0; left: 0;  border-bottom: 2px solid var(--ink); border-left: 2px solid var(--ink); }
 .frame .corner.br { bottom: 0; right: 0; border-bottom: 2px solid var(--ink); border-right: 2px solid var(--ink); }
 
-/* ---- The mark ---- */
+/* ---- The stage: 3D scene, with the flat mark underneath as the fallback ----
+ * The SVG paints instantly and stays put; the WebGL canvas fades in over it
+ * only once the model has actually loaded and rendered a frame. If WebGL is
+ * missing, the network fails, or motion is reduced, the SVG is simply what
+ * you get and nothing looks broken. */
+.stage {
+  position: relative;
+  width: 100%;
+  height: clamp(250px, 42vh, 380px);
+}
+.stage__3d {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms var(--ease, ease);
+}
+.stage.is-3d .stage__3d { opacity: 1; }
+
 .mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: clamp(150px, 34vw, 190px);
   height: auto;
   color: var(--forest);
   display: block;
-  margin: 0 auto;
   overflow: visible;
+  transition: opacity 400ms ease;
 }
+.stage.is-3d .mark { opacity: 0; pointer-events: none; }
 
 /* Steam: three wisps drifting up and fading, staggered into a loop. */
 .steam { opacity: 0; animation: steam 3.4s ease-in-out infinite; }
@@ -191,6 +223,9 @@ body::before {
   <span class="corner bl" aria-hidden="true"></span>
   <span class="corner br" aria-hidden="true"></span>
 
+  <div class="stage">
+  <div class="stage__3d" id="stage-3d" aria-hidden="true"></div>
+
   <svg class="mark" viewBox="0 0 100 100" fill="none" stroke="currentColor"
        stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
        role="img" aria-label="BrewInsight">
@@ -206,6 +241,7 @@ body::before {
     <path class="ekg-ghost" d="M36 60 L45 60 L49 50 L53 70 L57 60 L64 60" stroke-width="2.6"></path>
     <path class="ekg-pulse" d="M36 60 L45 60 L49 50 L53 70 L57 60 L64 60" stroke-width="2.6" pathLength="100"></path>
   </svg>
+  </div>
 
   <p class="wordmark">BrewInsight</p>
 
@@ -226,6 +262,29 @@ body::before {
     @brewinsight
   </a>
 </main>
+
+<script type="module">
+  /* Progressive enhancement: the flat mark above is already on screen. Only
+   * swap in the Blender scene once it has genuinely loaded and drawn. Any
+   * failure leaves the SVG in place. */
+  const stage = document.getElementById('stage-3d');
+  const wrap = document.querySelector('.stage');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (stage && !reduceMotion) {
+    /* Root-relative on purpose: this same markup is served as 404.html from
+     * arbitrary paths, where a './' specifier would resolve to the wrong place. */
+    import('/assets/3d/splash-3d.js?v=5')
+      .then((mod) => mod.init(stage))
+      .then((scene) => {
+        window.brewinsight3D = scene; // introspection handle
+        wrap.classList.add('is-3d');
+      })
+      .catch((err) => {
+        console.warn('[splash] 3D scene unavailable, keeping the flat mark.', err);
+      });
+  }
+</script>
 
 </body>
 </html>

@@ -152,6 +152,15 @@ export async function init(container, opts = {}) {
     m.needsUpdate = true;
   });
 
+  /* The terminal's two little feet read as clutter at splash scale. Removed
+   * from the graph rather than just hidden, because Box3.setFromObject counts
+   * invisible objects too and the framing below would still reserve space for
+   * them. */
+  for (const name of ['window_foot_1', 'window_foot_2']) {
+    const foot = model.getObjectByName(name);
+    if (foot) foot.removeFromParent();
+  }
+
   /* --- steam: glTF exports these opaque at alpha 1, so make them blendable --- */
   const wisps = [];
   for (const w of WISPS) {

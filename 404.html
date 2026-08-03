@@ -381,7 +381,7 @@ body::before {
 
   /* Root-relative on purpose: this same markup is served as 404.html from
    * arbitrary paths, where a './' specifier would resolve to the wrong place. */
-  import('/assets/3d/splash-3d.js?v=10')
+  import('/assets/3d/splash-3d.js?v=11')
     .then((mod) => mod.init(stage, { animate: !reduceMotion }))
     .then((scene) => {
       window.brewinsight3D = scene; // introspection handle

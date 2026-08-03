@@ -40,6 +40,8 @@
   --sketch-detail:#9DB191;
   --font-structure: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   --font-annotation: 'Caveat', cursive;
+  /* how far the corner crop-marks sit in from the screen edge */
+  --frame-gap: clamp(14px, 2.2vw, 28px);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -81,15 +83,19 @@ body::before {
   padding: clamp(26px, 4.5vw, 44px) clamp(22px, 5vw, 52px);
   text-align: center;
 }
+/* Fixed to the viewport corners rather than the content column, so the marks
+ * crop the whole screen, held off the edge by --frame-gap. */
 .frame .corner {
-  position: absolute;
-  width: 26px; height: 26px;
+  position: fixed;
+  width: clamp(24px, 2.6vw, 38px);
+  height: clamp(24px, 2.6vw, 38px);
   pointer-events: none;
+  z-index: 2;
 }
-.frame .corner.tl { top: 0; left: 0;  border-top: 2px solid var(--ink); border-left: 2px solid var(--ink); }
-.frame .corner.tr { top: 0; right: 0; border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
-.frame .corner.bl { bottom: 0; left: 0;  border-bottom: 2px solid var(--ink); border-left: 2px solid var(--ink); }
-.frame .corner.br { bottom: 0; right: 0; border-bottom: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.frame .corner.tl { top: var(--frame-gap); left: var(--frame-gap);  border-top: 2px solid var(--ink); border-left: 2px solid var(--ink); }
+.frame .corner.tr { top: var(--frame-gap); right: var(--frame-gap); border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+.frame .corner.bl { bottom: var(--frame-gap); left: var(--frame-gap);  border-bottom: 2px solid var(--ink); border-left: 2px solid var(--ink); }
+.frame .corner.br { bottom: var(--frame-gap); right: var(--frame-gap); border-bottom: 2px solid var(--ink); border-right: 2px solid var(--ink); }
 
 /* ---- The stage: 3D scene, with the flat mark underneath as the fallback ----
  * The SVG paints instantly and stays put; the WebGL canvas fades in over it

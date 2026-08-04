@@ -531,16 +531,22 @@ body::before {
 
 <script type="module">
 /* ---- Waitlist ----
- * Static hosting can't receive a form post, so submissions go to FormSubmit,
- * which forwards them to the inbox below. To switch provider (Formspree,
- * Mailchimp, a Worker of your own) change ENDPOINT and, if the shape differs,
- * the body built in send(). Nothing else here is provider-specific.
+ * Static hosting can't receive a form post, so submissions go to Web3Forms,
+ * which forwards them to brewinsight@gmail.com.
  *
- * FIRST-RUN: FormSubmit needs the destination address confirmed once. Submit
- * the form yourself, click the activation link that lands in the inbox, and
- * every submission after that arrives normally. Until then this shows the
- * error state rather than a false success. */
-const ENDPOINT = 'https://formsubmit.co/ajax/brewinsight@gmail.com';
+ * SETUP: get a free access key at https://web3forms.com/#start (enter
+ * brewinsight@gmail.com; the key arrives by email) and paste it below.
+ * Until a real key is in place the form skips the pointless network call and
+ * goes straight to the prefilled-email fallback, so signups still land.
+ *
+ * The key is a public, write-only submission token — it is safe in client-side
+ * source. It only lets a sender post to this one inbox; it cannot read
+ * anything back.
+ *
+ * FormSubmit was tried first and abandoned: its endpoint sits behind a
+ * Cloudflare bot challenge and returns a 403 interstitial instead of JSON. */
+const ACCESS_KEY = 'PASTE_WEB3FORMS_ACCESS_KEY_HERE';
+const ENDPOINT = 'https://api.web3forms.com/submit';
 
 (() => {
   const dialog = document.getElementById('notify');
@@ -586,21 +592,25 @@ const ENDPOINT = 'https://formsubmit.co/ajax/brewinsight@gmail.com';
   });
 
   async function send(address) {
+    if (!ACCESS_KEY || ACCESS_KEY.startsWith('PASTE_')) {
+      return { ok: false, message: 'No access key configured yet.' };
+    }
     const res = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
+        access_key: ACCESS_KEY,
+        subject: 'New BrewInsight waitlist signup',
+        from_name: 'BrewInsight splash',
         email: address,
-        _subject: 'New BrewInsight waitlist signup',
         consent: 'Agreed to receive launch news and marketing emails',
         source: 'splash waitlist',
       }),
     });
     let payload = {};
     try { payload = await res.json(); } catch (_) { /* non-JSON response */ }
-    // FormSubmit reports its own failures in the body, not the status code
-    const ok = res.ok && String(payload.success) !== 'false';
-    return { ok, message: payload.message };
+    // check the body too: providers report their own failures with a 200
+    return { ok: res.ok && payload.success === true, message: payload.message };
   }
 
   form.addEventListener('submit', async (e) => {

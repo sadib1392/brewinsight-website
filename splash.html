@@ -502,6 +502,9 @@ body::before {
         </button>
 
         <p class="error" id="notify-form-error" hidden></p>
+        <a class="cta cta--block" id="notify-mailto" href="#" hidden style="margin-top: 12px;">
+          Email us instead
+        </a>
 
         <p class="fineprint">
           We only use your email to send you BrewInsight updates. We never sell it
@@ -629,9 +632,17 @@ const ENDPOINT = 'https://formsubmit.co/ajax/brewinsight@gmail.com';
       done.hidden = false;
       track('waitlist_submit');
     } catch (err) {
-      /* Never fake a success. Give them a route that cannot fail instead. */
-      show(formErr,
-        'Sorry, that did not go through. Please email us directly at brewinsight@gmail.com and we will add you.');
+      /* Never fake a success. Offer a route that cannot fail instead: a
+       * prefilled email, one tap, carrying the address and the consent. */
+      show(formErr, 'Sorry, that did not go through on our end. One tap and you can send it to us directly instead.');
+      const mailto = document.getElementById('notify-mailto');
+      mailto.href =
+        'mailto:brewinsight@gmail.com'
+        + '?subject=' + encodeURIComponent('Add me to the BrewInsight waitlist')
+        + '&body=' + encodeURIComponent(
+          'Please add me to the BrewInsight waitlist.\n\nEmail: ' + address
+          + '\n\nI agree to receive launch news and marketing emails from BrewInsight.');
+      mailto.hidden = false;
       track('waitlist_error');
       console.warn('[waitlist]', err);
     } finally {

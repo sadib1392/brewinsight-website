@@ -191,7 +191,12 @@ export async function init(container, opts = {}) {
   const box = new THREE.Box3().setFromObject(model);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
-  const viewDir = new THREE.Vector3(0.26, 0.14, 1).normalize();
+  /* The terminal carries a -5.7 deg yaw and -5.2 deg pitch from the .blend, so
+   * a camera parked off to the right ends up viewing the screen ~20 deg
+   * off-axis: the face turns away and the shell's 75 mm side flares out at the
+   * bottom-right corner. Sitting nearer the screen's own normal keeps a little
+   * dimensionality without the skew. */
+  const viewDir = new THREE.Vector3(0.08, 0.1, 1).normalize();
 
   /* --- on the glow ---
    * No EffectComposer/UnrealBloomPass here, deliberately. Its final composite

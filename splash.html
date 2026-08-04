@@ -75,6 +75,15 @@
   /* motes drifting along the grid lines */
   --flow-color: rgba(56, 104, 48, 0.70);
   --flow-alpha: 0.40;
+
+  /* the call to action + the sheet it opens */
+  --btn-bg:      var(--forest);
+  --btn-fg:      var(--paper);
+  --sheet-bg:    var(--paper);
+  --sheet-line:  var(--track-grey);
+  --field-bg:    #FFFFFF;
+  --scrim:       rgba(26, 26, 26, 0.42);
+  --danger:      #A6382B;
 }
 
 /* Deep green is the brand's only dark surface — never black. Lime is the
@@ -101,6 +110,15 @@
 
     --flow-color: rgba(136, 192, 72, 0.85);
     --flow-alpha: 0.50;
+
+    /* lime button on the dark ground, with deep green type for contrast */
+    --btn-bg:     var(--lime);
+    --btn-fg:     var(--deep-green);
+    --sheet-bg:   #22381F;
+    --sheet-line: rgba(247, 244, 239, 0.16);
+    --field-bg:   rgba(0, 0, 0, 0.22);
+    --scrim:      rgba(10, 18, 10, 0.62);
+    --danger:     #E4907F;
   }
 }
 
@@ -253,6 +271,152 @@ body::before {
 }
 .follow:hover { border-color: var(--accent); color: var(--accent); }
 .follow svg { width: 19px; height: 19px; }
+
+/* ---- Call to action ---- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 3vw, 22px);
+  margin-top: clamp(24px, 5vw, 34px);
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+  min-height: 48px;
+  padding: 14px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-structure);
+  font-size: var(--ui-base, 16px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 140ms ease, transform 140ms ease;
+}
+.cta:hover { filter: brightness(0.94); }
+.cta:active { filter: brightness(0.88); transform: translateY(1px); }
+.cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cta svg { width: 17px; height: 17px; }
+.cta--block { width: 100%; }
+
+/* ---- The sheet ---- */
+.sheet {
+  width: min(430px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid var(--sheet-line);
+  border-radius: 16px;
+  background: var(--sheet-bg);
+  color: var(--fg);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+}
+.sheet::backdrop { background: var(--scrim); }
+.sheet__inner { padding: clamp(24px, 5vw, 32px); text-align: left; }
+.sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.sheet__title {
+  margin: 0;
+  font-size: clamp(19px, 4vw, 23px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--fg);
+}
+.sheet__lede {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--pill-text);
+}
+.sheet__x {
+  flex: 0 0 auto;
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 999px;
+  background: transparent;
+  color: var(--pill-text);
+  cursor: pointer;
+}
+.sheet__x:hover { color: var(--fg); }
+.sheet__x svg { width: 17px; height: 17px; }
+
+.field { display: block; margin-top: 20px; }
+.field__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pill-text);
+  margin-bottom: 7px;
+}
+.field__input {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid var(--sheet-line);
+  border-radius: 10px;
+  background: var(--field-bg);
+  color: var(--fg);
+  font-family: var(--font-structure);
+  font-size: 15px;
+}
+.field__input::placeholder { color: var(--pill-text); opacity: 0.7; }
+.field__input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--pill-text);
+  cursor: pointer;
+}
+.consent input {
+  flex: 0 0 auto;
+  width: 17px; height: 17px;
+  margin-top: 1px;
+  accent-color: var(--accent);
+}
+
+.error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--danger);
+}
+.error[hidden] { display: none; }
+
+.fineprint {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--pill-text);
+  opacity: 0.85;
+}
+.fineprint a { color: inherit; }
+
+.sheet__done { text-align: center; padding: 8px 0 4px; }
+.sheet__done .tick {
+  width: 46px; height: 46px;
+  margin: 0 auto 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+.sheet__done .tick svg { width: 22px; height: 22px; }
+.sheet__done .aside { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -274,15 +438,209 @@ body::before {
   <h1 class="message">
     We are busy brewing something up. <span class="accent">Check back later to see our concoction!</span>
   </h1>
-  <a class="follow" href="https://instagram.com/brewinsight" target="_blank" rel="noopener"
-     aria-label="BrewInsight on Instagram" title="@brewinsight">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-    </svg>
-  </a>
+  <div class="actions">
+    <button class="cta" type="button" id="notify-open">
+      Hear more about BrewInsight
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </button>
+
+    <a class="follow" href="https://instagram.com/brewinsight" target="_blank" rel="noopener"
+       aria-label="BrewInsight on Instagram" title="@brewinsight">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+    </a>
+  </div>
 </main>
+
+<!-- Waitlist. <dialog> is used deliberately: it gives focus trapping, Esc to
+     close and inertness of the page behind it without any of that being
+     hand-rolled. -->
+<dialog class="sheet" id="notify" aria-labelledby="notify-title">
+  <div class="sheet__inner">
+
+    <div id="notify-view">
+      <div class="sheet__head">
+        <div>
+          <h2 class="sheet__title" id="notify-title">Know the moment we launch</h2>
+          <p class="sheet__lede">
+            BrewInsight turns your café's reviews, local search trends and industry
+            data into one short weekly read. Leave your email and we'll tell you
+            the day it opens up.
+          </p>
+        </div>
+        <button class="sheet__x" type="button" id="notify-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="notify-form" novalidate>
+        <label class="field">
+          <span class="field__label">Email</span>
+          <input class="field__input" type="email" id="notify-email" name="email"
+                 autocomplete="email" placeholder="jamie@cornerroasters.com" required>
+        </label>
+        <p class="error" id="notify-email-error" hidden></p>
+
+        <label class="consent">
+          <input type="checkbox" id="notify-consent" name="consent" required>
+          <span>Yes, email me BrewInsight updates, including launch news and the
+                occasional marketing message. I can unsubscribe at any time.</span>
+        </label>
+        <p class="error" id="notify-consent-error" hidden></p>
+
+        <button class="cta cta--block" type="submit" id="notify-submit" style="margin-top: 22px;">
+          Keep me posted
+        </button>
+
+        <p class="error" id="notify-form-error" hidden></p>
+
+        <p class="fineprint">
+          We only use your email to send you BrewInsight updates. We never sell it
+          or pass it on.
+        </p>
+      </form>
+    </div>
+
+    <div id="notify-done" class="sheet__done" hidden>
+      <span class="tick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </span>
+      <h2 class="sheet__title">You're on the list.</h2>
+      <p class="sheet__lede">We'll email you the moment BrewInsight opens up. ☕</p>
+      <button class="cta cta--block" type="button" id="notify-done-close" style="margin-top: 22px;">
+        Close
+      </button>
+    </div>
+
+  </div>
+</dialog>
+
+<script type="module">
+/* ---- Waitlist ----
+ * Static hosting can't receive a form post, so submissions go to FormSubmit,
+ * which forwards them to the inbox below. To switch provider (Formspree,
+ * Mailchimp, a Worker of your own) change ENDPOINT and, if the shape differs,
+ * the body built in send(). Nothing else here is provider-specific.
+ *
+ * FIRST-RUN: FormSubmit needs the destination address confirmed once. Submit
+ * the form yourself, click the activation link that lands in the inbox, and
+ * every submission after that arrives normally. Until then this shows the
+ * error state rather than a false success. */
+const ENDPOINT = 'https://formsubmit.co/ajax/brewinsight@gmail.com';
+
+(() => {
+  const dialog = document.getElementById('notify');
+  const openBtn = document.getElementById('notify-open');
+  if (!dialog || !openBtn) return;
+
+  const form = document.getElementById('notify-form');
+  const view = document.getElementById('notify-view');
+  const done = document.getElementById('notify-done');
+  const email = document.getElementById('notify-email');
+  const consent = document.getElementById('notify-consent');
+  const submit = document.getElementById('notify-submit');
+  const emailErr = document.getElementById('notify-email-error');
+  const consentErr = document.getElementById('notify-consent-error');
+  const formErr = document.getElementById('notify-form-error');
+
+  const track = (name, params) => {
+    if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+  };
+
+  const show = (el, message) => { el.textContent = message; el.hidden = false; };
+  const clear = (el) => { el.hidden = true; el.textContent = ''; };
+
+  function open() {
+    view.hidden = false;
+    done.hidden = true;
+    dialog.showModal();
+    track('waitlist_open');
+  }
+
+  openBtn.addEventListener('click', open);
+  document.getElementById('notify-close').addEventListener('click', () => dialog.close());
+  document.getElementById('notify-done-close').addEventListener('click', () => dialog.close());
+
+  // click outside the panel to dismiss
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+  [email, consent].forEach((el) => {
+    el.addEventListener('input', () => {
+      clear(el === email ? emailErr : consentErr);
+      clear(formErr);
+    });
+  });
+
+  async function send(address) {
+    const res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        email: address,
+        _subject: 'New BrewInsight waitlist signup',
+        consent: 'Agreed to receive launch news and marketing emails',
+        source: 'splash waitlist',
+      }),
+    });
+    let payload = {};
+    try { payload = await res.json(); } catch (_) { /* non-JSON response */ }
+    // FormSubmit reports its own failures in the body, not the status code
+    const ok = res.ok && String(payload.success) !== 'false';
+    return { ok, message: payload.message };
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clear(formErr);
+
+    const address = email.value.trim();
+    let bad = false;
+    if (!address || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
+      show(emailErr, 'Please enter an email address we can reach you at.');
+      bad = true;
+    } else clear(emailErr);
+
+    if (!consent.checked) {
+      show(consentErr, 'Please tick the box so we know it is ok to email you.');
+      bad = true;
+    } else clear(consentErr);
+
+    if (bad) return;
+
+    submit.disabled = true;
+    const label = submit.textContent;
+    submit.textContent = 'Sending…';
+
+    try {
+      const { ok, message } = await send(address);
+      if (!ok) throw new Error(message || 'The signup service did not accept that.');
+      view.hidden = true;
+      done.hidden = false;
+      track('waitlist_submit');
+    } catch (err) {
+      /* Never fake a success. Give them a route that cannot fail instead. */
+      show(formErr,
+        'Sorry, that did not go through. Please email us directly at brewinsight@gmail.com and we will add you.');
+      track('waitlist_error');
+      console.warn('[waitlist]', err);
+    } finally {
+      submit.disabled = false;
+      submit.textContent = label;
+    }
+  });
+})();
+</script>
 
 <script type="module">
 /* Little squares drifting along the grid lines. Deliberately sparse and slow:

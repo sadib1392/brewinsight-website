@@ -19,6 +19,9 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<!-- Opt in to the boot reveal only when script is actually running. Without
+     this line nothing on the card is ever hidden. -->
+<script>document.documentElement.className="boot"</script>
 <style>
 /* ==========================================================================
    BrewInsight digital business card
@@ -181,9 +184,14 @@ a.ln:focus-visible{background:var(--cream);color:var(--deep);outline:none}
 .toast.up{transform:translate(-50%,0);opacity:1;visibility:visible}
 
 /* ------------------------------------------------------------ boot reveal */
-.boot .rv{opacity:0}
+/* The hiding only ever applies once script has run and set .boot on <html>,
+   so a card whose JS is blocked or broken simply renders in full. The failsafe
+   animation covers the other half of that: script started, then died before it
+   could reveal anything. Belt and braces, because a blank card is worthless. */
+.boot .rv{opacity:0;animation:rvfail .01s linear 2.5s forwards}
 .boot .rv.in{animation:rv .18s ease both}
 @keyframes rv{from{opacity:0;transform:translateX(-.35em)}to{opacity:1;transform:none}}
+@keyframes rvfail{to{opacity:1}}
 
 @media (prefers-reduced-motion:reduce){
   .caret{animation:none}
@@ -308,7 +316,7 @@ a.ln:focus-visible{background:var(--cream);color:var(--deep);outline:none}
 }
 </style>
 </head>
-<body class="boot">
+<body>
 
 <main class="card" aria-label="Digital business card for Syed Adib, Co-founder & Head of Growth at BrewInsight">
 
@@ -472,13 +480,13 @@ a.ln:focus-visible{background:var(--cream);color:var(--deep);outline:none}
 
   /* ------------------------------------------------------- boot reveal */
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    document.body.classList.remove("boot");
+    document.documentElement.classList.remove("boot");
   } else {
     var lines = document.querySelectorAll(".rv");
     Array.prototype.forEach.call(lines, function(el, i){
       setTimeout(function(){ el.classList.add("in"); }, 90 + i * 85);
     });
-    setTimeout(function(){ document.body.classList.remove("boot"); },
+    setTimeout(function(){ document.documentElement.classList.remove("boot"); },
                90 + lines.length * 85 + 300);
   }
 })();

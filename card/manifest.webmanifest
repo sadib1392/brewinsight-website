@@ -1,0 +1,25 @@
+{
+  "name": "Syed Adib \u2014 BrewInsight",
+  "short_name": "BrewInsight",
+  "description": "Sourced coffee data and insights for caf\u00e9 owners.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1B2E1A",
+  "theme_color": "#1B2E1A",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

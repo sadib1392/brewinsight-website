@@ -363,6 +363,10 @@ body::before {
 .sheet__x svg { width: 17px; height: 17px; }
 
 .field { display: block; margin-top: 20px; }
+/* First/last sit side by side, then stack once the columns would be too
+ * narrow to type a name into comfortably. */
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 430px) { .field-row { grid-template-columns: 1fr; gap: 0; } }
 .field__label {
   display: block;
   font-size: 12px;
@@ -529,8 +533,8 @@ body::before {
           <h2 class="sheet__title" id="notify-title">Know the moment we launch</h2>
           <p class="sheet__lede">
             BrewInsight turns your café's reviews, local search trends and industry
-            data into one short weekly read. Leave your email and we'll tell you
-            the day it opens up.
+            data into one short weekly read. Leave your name and email and we'll
+            tell you the day it opens up.
           </p>
         </div>
         <button class="sheet__x" type="button" id="notify-close" aria-label="Close">
@@ -550,6 +554,20 @@ body::before {
         </div>
 
         <p class="signed-in" id="signed-in" hidden></p>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="field__label">First name</span>
+            <input class="field__input" type="text" id="notify-first" name="first_name"
+                   autocomplete="given-name" placeholder="Jamie" required>
+          </label>
+          <label class="field">
+            <span class="field__label">Last name</span>
+            <input class="field__input" type="text" id="notify-last" name="last_name"
+                   autocomplete="family-name" placeholder="Okafor" required>
+          </label>
+        </div>
+        <p class="error" id="notify-name-error" hidden></p>
 
         <label class="field">
           <span class="field__label">Email</span>
@@ -629,7 +647,7 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
  * Signing in only supplies a verified, typo-free address. It is NOT consent to
  * be emailed marketing — the checkbox below still governs that, and still has
  * to be ticked either way. */
-const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
+const GOOGLE_CLIENT_ID = '576074482509-097hcgtm256ihuimmj9a6p12s25ua3ih.apps.googleusercontent.com';
 
 (() => {
   const dialog = document.getElementById('notify');
@@ -639,9 +657,12 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
   const form = document.getElementById('notify-form');
   const view = document.getElementById('notify-view');
   const done = document.getElementById('notify-done');
+  const first = document.getElementById('notify-first');
+  const last = document.getElementById('notify-last');
   const email = document.getElementById('notify-email');
   const consent = document.getElementById('notify-consent');
   const submit = document.getElementById('notify-submit');
+  const nameErr = document.getElementById('notify-name-error');
   const emailErr = document.getElementById('notify-email-error');
   const consentErr = document.getElementById('notify-consent-error');
   const captchaErr = document.getElementById('notify-captcha-error');
@@ -699,8 +720,14 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
       signedIn.hidden = false;
       googleBlock.hidden = true;
       clear(emailErr);
+      /* Prefill the names but leave them editable. Unlike the address, a Google
+       * display name is not a verification anchor — it is often informal or
+       * missing a surname entirely, and the person should be able to fix it. */
+      if (!first.value.trim() && claims.given_name) first.value = claims.given_name;
+      if (!last.value.trim() && claims.family_name) last.value = claims.family_name;
+      if (first.value.trim() && last.value.trim()) clear(nameErr);
       track('waitlist_google');
-      consent.focus();
+      (!first.value.trim() ? first : !last.value.trim() ? last : consent).focus();
     } catch (err) {
       console.warn('[waitlist] could not read the Google credential', err);
       show(emailErr, 'That sign-in did not come through. Please type your email instead.');
@@ -766,8 +793,11 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
       clear(formErr);
     });
   });
+  [first, last].forEach((el) => {
+    el.addEventListener('input', () => { clear(nameErr); clear(formErr); });
+  });
 
-  async function send(address, captchaToken) {
+  async function send(address, names, captchaToken) {
     if (!ACCESS_KEY || ACCESS_KEY.startsWith('PASTE_')) {
       return { ok: false, message: 'No access key configured yet.' };
     }
@@ -779,7 +809,9 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
         subject: 'New BrewInsight waitlist signup',
         from_name: 'BrewInsight splash',
         email: address,
-        name: signedInName || '(not supplied)',
+        name: names.first + ' ' + names.last,
+        first_name: names.first,
+        last_name: names.last,
         consent: 'Agreed to receive launch news and marketing emails',
         source: 'splash waitlist',
         // which route they took, so you can tell verified addresses from typed
@@ -798,7 +830,16 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
     clear(formErr);
 
     const address = email.value.trim();
+    const names = { first: first.value.trim(), last: last.value.trim() };
     let bad = false;
+
+    if (!names.first || !names.last) {
+      show(nameErr, !names.first && !names.last ? 'Please add your first and last name.'
+        : !names.first ? 'Please add your first name.'
+          : 'Please add your last name.');
+      bad = true;
+    } else clear(nameErr);
+
     if (!address || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
       show(emailErr, 'Please enter an email address we can reach you at.');
       bad = true;
@@ -827,7 +868,7 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
     submit.textContent = 'Sending…';
 
     try {
-      const { ok, message } = await send(address, captchaToken);
+      const { ok, message } = await send(address, names, captchaToken);
       if (!ok) throw new Error(message || 'The signup service did not accept that.');
       view.hidden = true;
       done.hidden = false;
@@ -841,7 +882,9 @@ const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
         'mailto:brewinsight@gmail.com'
         + '?subject=' + encodeURIComponent('Add me to the BrewInsight waitlist')
         + '&body=' + encodeURIComponent(
-          'Please add me to the BrewInsight waitlist.\n\nEmail: ' + address
+          'Please add me to the BrewInsight waitlist.'
+          + '\n\nName: ' + names.first + ' ' + names.last
+          + '\nEmail: ' + address
           + '\n\nI agree to receive launch news and marketing emails from BrewInsight.');
       mailto.hidden = false;
       /* A token is single-use, so the widget must be reset or a retry always

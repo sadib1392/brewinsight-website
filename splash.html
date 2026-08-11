@@ -20,6 +20,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;600;800;900&display=swap">
 
+<!-- hCaptcha, explicitly rendered. Auto-render is avoided on purpose: the
+     widget lives inside a <dialog> that is closed at load, and auto-render
+     sizes it badly there and gives no control over the light/dark theme. -->
+<script>
+  window.onHcaptchaLoad = function () {
+    document.dispatchEvent(new Event('hcaptcha:ready'));
+  };
+</script>
+<script src="https://js.hcaptcha.com/1/api.js?render=explicit&onload=onHcaptchaLoad" async defer></script>
+
 <script type="importmap">
 {
   "imports": {
@@ -123,6 +133,10 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Any author `display` rule (e.g. .cta's inline-flex) outranks the browser's
+ * [hidden]{display:none}, so hidden elements stay visible without this. */
+[hidden] { display: none !important; }
 
 html, body { height: 100%; }
 
@@ -389,6 +403,11 @@ body::before {
   accent-color: var(--accent);
 }
 
+/* hCaptcha renders a fixed-width iframe; let it shrink on narrow phones
+ * rather than pushing the sheet wider than the screen. */
+.captcha { margin-top: 18px; min-height: 78px; }
+.captcha iframe { max-width: 100%; }
+
 .error {
   margin: 8px 0 0;
   font-size: 13px;
@@ -497,6 +516,9 @@ body::before {
         </label>
         <p class="error" id="notify-consent-error" hidden></p>
 
+        <div class="captcha" id="hcaptcha-box"></div>
+        <p class="error" id="notify-captcha-error" hidden></p>
+
         <button class="cta cta--block" type="submit" id="notify-submit" style="margin-top: 22px;">
           Keep me posted
         </button>
@@ -561,7 +583,28 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
   const submit = document.getElementById('notify-submit');
   const emailErr = document.getElementById('notify-email-error');
   const consentErr = document.getElementById('notify-consent-error');
+  const captchaErr = document.getElementById('notify-captcha-error');
   const formErr = document.getElementById('notify-form-error');
+
+  /* ---- hCaptcha ----
+   * Web3Forms verifies the token server-side against its own hCaptcha secret,
+   * so this sitekey is theirs, not one we register. Rendered explicitly when
+   * the dialog opens, in the viewer's colour scheme. */
+  const HCAPTCHA_SITEKEY = '50b2fe65-b00b-4b9e-ad62-3ba471098be2';
+  let widgetId = null;
+
+  function renderCaptcha() {
+    if (widgetId !== null || !window.hcaptcha) return;
+    try {
+      widgetId = window.hcaptcha.render('hcaptcha-box', {
+        sitekey: HCAPTCHA_SITEKEY,
+        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+      });
+    } catch (err) {
+      console.warn('[waitlist] captcha render failed', err);
+    }
+  }
+  document.addEventListener('hcaptcha:ready', () => { if (dialog.open) renderCaptcha(); });
 
   const track = (name, params) => {
     if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
@@ -574,6 +617,7 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
     view.hidden = false;
     done.hidden = true;
     dialog.showModal();
+    renderCaptcha();
     track('waitlist_open');
   }
 
@@ -591,7 +635,7 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
     });
   });
 
-  async function send(address) {
+  async function send(address, captchaToken) {
     if (!ACCESS_KEY || ACCESS_KEY.startsWith('PASTE_')) {
       return { ok: false, message: 'No access key configured yet.' };
     }
@@ -605,6 +649,7 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
         email: address,
         consent: 'Agreed to receive launch news and marketing emails',
         source: 'splash waitlist',
+        'h-captcha-response': captchaToken,
       }),
     });
     let payload = {};
@@ -629,6 +674,17 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
       bad = true;
     } else clear(consentErr);
 
+    /* If hCaptcha is present it has to be solved. If it never loaded (blocked
+     * by an extension, offline), don't strand a real person behind a widget
+     * that isn't there — let it through to the email fallback instead. */
+    const captchaToken = window.hcaptcha && widgetId !== null
+      ? window.hcaptcha.getResponse(widgetId)
+      : '';
+    if (window.hcaptcha && widgetId !== null && !captchaToken) {
+      show(captchaErr, 'Please complete the "I am human" check.');
+      bad = true;
+    } else clear(captchaErr);
+
     if (bad) return;
 
     submit.disabled = true;
@@ -636,7 +692,7 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
     submit.textContent = 'Sending…';
 
     try {
-      const { ok, message } = await send(address);
+      const { ok, message } = await send(address, captchaToken);
       if (!ok) throw new Error(message || 'The signup service did not accept that.');
       view.hidden = true;
       done.hidden = false;
@@ -653,6 +709,9 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
           'Please add me to the BrewInsight waitlist.\n\nEmail: ' + address
           + '\n\nI agree to receive launch news and marketing emails from BrewInsight.');
       mailto.hidden = false;
+      /* A token is single-use, so the widget must be reset or a retry always
+       * fails with "already seen". */
+      if (window.hcaptcha && widgetId !== null) window.hcaptcha.reset(widgetId);
       track('waitlist_error');
       console.warn('[waitlist]', err);
     } finally {

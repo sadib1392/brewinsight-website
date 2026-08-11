@@ -20,6 +20,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;600;800;900&display=swap">
 
+<!-- Google Identity Services. Only a client ID is needed for this flow (no
+     secret), and that ID is public by design. -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <!-- hCaptcha, explicitly rendered. Auto-render is avoided on purpose: the
      widget lives inside a <dialog> that is closed at load, and auto-render
      sizes it badly there and gives no control over the light/dark theme. -->
@@ -403,6 +407,42 @@ body::before {
   accent-color: var(--accent);
 }
 
+/* ---- Google Sign-In ---- */
+.gbtn { display: flex; justify-content: center; margin-top: 20px; min-height: 44px; }
+.gbtn > div { max-width: 100%; }
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pill-text);
+}
+.or::before, .or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--sheet-line);
+}
+
+.signed-in {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--fg);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.signed-in .tickmark { color: var(--accent); flex: 0 0 auto; }
+.signed-in svg { width: 15px; height: 15px; display: block; }
+
 /* hCaptcha renders a fixed-width iframe; let it shrink on narrow phones
  * rather than pushing the sheet wider than the screen. */
 .captcha { margin-top: 18px; min-height: 78px; }
@@ -502,6 +542,15 @@ body::before {
       </div>
 
       <form id="notify-form" novalidate>
+        <!-- Hidden until a client ID is configured, so a missing ID shows
+             nothing rather than a dead button. -->
+        <div id="google-block" hidden>
+          <div id="google-btn" class="gbtn"></div>
+          <div class="or"><span>or</span></div>
+        </div>
+
+        <p class="signed-in" id="signed-in" hidden></p>
+
         <label class="field">
           <span class="field__label">Email</span>
           <input class="field__input" type="email" id="notify-email" name="email"
@@ -570,6 +619,18 @@ body::before {
 const ACCESS_KEY = '83937959-90f6-4934-95f6-c47563338c64';
 const ENDPOINT = 'https://api.web3forms.com/submit';
 
+/* ---- Google Sign-In ----
+ * Create an OAuth client ID at console.cloud.google.com (APIs & Services →
+ * Credentials → Create credentials → OAuth client ID → Web application) with
+ * https://brewinsight.io and http://localhost:8731 as authorised JavaScript
+ * origins, then paste it here. The client ID is public by design; no secret is
+ * involved in this flow.
+ *
+ * Signing in only supplies a verified, typo-free address. It is NOT consent to
+ * be emailed marketing — the checkbox below still governs that, and still has
+ * to be ticked either way. */
+const GOOGLE_CLIENT_ID = 'PASTE_GOOGLE_CLIENT_ID_HERE';
+
 (() => {
   const dialog = document.getElementById('notify');
   const openBtn = document.getElementById('notify-open');
@@ -606,6 +667,68 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
   }
   document.addEventListener('hcaptcha:ready', () => { if (dialog.open) renderCaptcha(); });
 
+  /* ---- Google Sign-In ----
+   * The returned JWT is signed by Google, but a static host has no server to
+   * verify that signature on. That is acceptable here because the endpoint
+   * already accepts arbitrary posts — the win is a real, typo-free address and
+   * one-tap entry, not authentication. */
+  const googleBlock = document.getElementById('google-block');
+  const signedIn = document.getElementById('signed-in');
+  let googleRendered = false;
+  let signedInName = '';
+
+  function decodeJwt(token) {
+    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes)); // handles non-ASCII names
+  }
+
+  function onGoogleCredential(response) {
+    try {
+      const claims = decodeJwt(response.credential);
+      if (!claims.email) throw new Error('no email claim');
+      email.value = claims.email;
+      email.readOnly = true;
+      signedInName = claims.name || '';
+      signedIn.innerHTML =
+        '<span class="tickmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+        + 'stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        + '<polyline points="20 6 9 17 4 12"></polyline></svg></span>'
+        + '<span>Signed in as <strong></strong></span>';
+      signedIn.querySelector('strong').textContent = claims.email; // textContent, never innerHTML
+      signedIn.hidden = false;
+      googleBlock.hidden = true;
+      clear(emailErr);
+      track('waitlist_google');
+      consent.focus();
+    } catch (err) {
+      console.warn('[waitlist] could not read the Google credential', err);
+      show(emailErr, 'That sign-in did not come through. Please type your email instead.');
+    }
+  }
+
+  function renderGoogle() {
+    if (googleRendered || !window.google || !window.google.accounts) return;
+    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.startsWith('PASTE_')) return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: onGoogleCredential,
+      });
+      window.google.accounts.id.renderButton(document.getElementById('google-btn'), {
+        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'filled_black' : 'outline',
+        size: 'large',
+        shape: 'pill',
+        text: 'continue_with',
+        width: 300,
+      });
+      googleBlock.hidden = false;
+      googleRendered = true;
+    } catch (err) {
+      console.warn('[waitlist] Google Sign-In unavailable', err);
+    }
+  }
+
   const track = (name, params) => {
     if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
   };
@@ -618,6 +741,15 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
     done.hidden = true;
     dialog.showModal();
     renderCaptcha();
+    /* The GSI script is async, so it may not have arrived by the time the
+     * dialog opens. Retry briefly, then give up quietly and leave the typed
+     * email field as the only route. */
+    renderGoogle();
+    let tries = 0;
+    const poll = setInterval(() => {
+      if (googleRendered || ++tries > 20) clearInterval(poll);
+      else renderGoogle();
+    }, 150);
     track('waitlist_open');
   }
 
@@ -647,8 +779,11 @@ const ENDPOINT = 'https://api.web3forms.com/submit';
         subject: 'New BrewInsight waitlist signup',
         from_name: 'BrewInsight splash',
         email: address,
+        name: signedInName || '(not supplied)',
         consent: 'Agreed to receive launch news and marketing emails',
         source: 'splash waitlist',
+        // which route they took, so you can tell verified addresses from typed
+        signup_method: (signedInName || email.readOnly) ? 'Google Sign-In' : 'typed email',
         'h-captcha-response': captchaToken,
       }),
     });
